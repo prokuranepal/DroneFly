@@ -23,3 +23,9 @@ Here master is generally, 127.0.0.1:5760 which is provided by the dronekit-sitl,
 ```
 python simple_goto.py --connect 127.0.0.1:14551
 ```
+### Program Description
+* Initially the program stores the gps coordinates of home.
+* The xvel, yvel and gps coordinates are stored in array at each waypoint, until the failsafe is activated inside a loop.
+* using the gps coordinate of each waypoint the distance between each waypoint is calculated and stored.
+* the required time for command ned_vel is calculated using the velocity and distance
+* the command ned_vel is applied with velocity in just the opposite direction of stored value for the calculated amount of time.
