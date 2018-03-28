@@ -46,8 +46,8 @@ vehicle.wait_ready('autopilot_version')
 print("\nGet all vehicle attribute values:")
 check=True
 print(type(vehicle.location.global_frame))
-initial_battery = vehicle.battery
-final_battery=initial_battery
+#initial_battery = vehicle.battery
+#final_battery=initial_battery
 location_lat=[] #initializing array to store lattitudes after reaching each waypoint
 location_lon=[] # initializing array to store longitudes after reaching each waypoint
 location_lat.append(vehicle.location.global_frame.lat) #storing latitude of home/ drone's initial position
@@ -216,7 +216,7 @@ waypoint_reached=0
 vel_x = []# initializing array to store x(NS), velocity at each waypoint
 vel_y = []#initializingarray to store y(EW), velocity at each waypoint
 
-while((initial_battery.level-final_battery.level)<25):#checking while batttery level does not drop by 25%
+while((vehicle.commands.next<=6)):#checking while batttery level does not drop by 25%
     if(vehicle.commands.next>2 and waypoint_reached!=vehicle.commands.next):# it should be greater or equal to 2 because takeoff is always considered 1st, for which we do not need to calculate distance, waypoint!=vehicle.commands.next means when next waypoint is reached
         [final_vel_x,final_vel_y,final_vel_z]=vehicle.velocity
         location_lat.append(vehicle.location.global_frame.lat)
