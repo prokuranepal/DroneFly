@@ -41,7 +41,8 @@ public class FlyFragment extends Fragment {
     private View view;
     private Button flyButton;
     private Button statusButton;
-    private final String urlString = "https://nicwebpage.herokuapp.com/android?fly=1";
+    //private final String urlString = "https://nicwebpage.herokuapp.com/android?fly=1";
+    private final String urlString = "http://192.168.1.119:3000";
     private String result = "";
     private Socket socket;
 
@@ -50,6 +51,7 @@ public class FlyFragment extends Fragment {
     }
 
 
+    //sending data to the node js server so it can forward it, to the raspberry pi in drone to start the flight
     public class SendFlyCommand extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
@@ -113,7 +115,7 @@ public class FlyFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                //sending data to the node js server so it can forward it, to the raspberry pi in drone to start the flight
+                //class which contains send function to the server as async task
                 SendFlyCommand sendFlyCommand = new SendFlyCommand();
                 try {
 
@@ -122,6 +124,7 @@ public class FlyFragment extends Fragment {
                         throw new Exception();
                     }
 
+                    //execute worker thread to send data
                     sendFlyCommand.execute().get();
 
                 }catch (InterruptedException e) {
@@ -132,14 +135,16 @@ public class FlyFragment extends Fragment {
                     Log.i("INFO","Failed Sending");
                 } catch(Exception e) {
                     Log.i("INFO","No internet connection may be");
+                    Toast.makeText(getContext(), "No Internet", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
 
-        //starting status fragment to display the web page content of status of drone
+        //status fragment to display the web page content of status of drone
         statusButton = view.findViewById(R.id.statusButton);
 
+        //callback function for status button to start status fragment
         statusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,56 +158,63 @@ public class FlyFragment extends Fragment {
         try {
 
             //check for internet connection
-            if(!isOnline())
+            if(!isOnline()) {
                 throw new Exception();
+            }
 
+            //generating a random number for join id in the server
             Random rand = new Random();
             int  id = rand.nextInt(50) + 1;
 
-            socket = IO.socket("http://192.168.1.119:3000"); //specifying the url
+            socket = IO.socket(urlString); //specifying the url
             socket.connect(); //connecting to the server
-            socket.emit("joinAndroid",Integer.toString(id) );
+            socket.emit("joinAndroid",Integer.toString(id) );  //specifying the join group to the server
+
+            //callback functions for socket connected, message received and socket disconnected
+
+            socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+
+                @Override
+                public void call(Object... args) {
+                }
+
+            }).on("message", new Emitter.Listener() {
+
+                @Override
+                public void call(Object... args) {
+
+                    Log.i("INFO",args[0].toString());
+                    //Toast.makeText(getContext(), args[0].toString(), Toast.LENGTH_SHORT).show();
+
+                }
+
+            }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+
+                @Override
+                public void call(Object... args) {
+                }
+
+            });
         } catch(URISyntaxException e) {
             Log.i("INFO","Uri syntax exception");
         } catch(Exception e) {
             Log.i("INFO", "No internet connection");
+            Toast.makeText(getContext(), "No Internet", Toast.LENGTH_LONG).show();
         }
-
-        //callback functions for socket connected, message received and socket disconnected
-        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-
-            @Override
-            public void call(Object... args) {
-            }
-
-        }).on("message", new Emitter.Listener() {
-
-            @Override
-            public void call(Object... args) {
-
-                Log.i("INFO",args[0].toString());
-                //Toast.makeText(getContext(), args[0].toString(), Toast.LENGTH_SHORT).show();
-
-            }
-
-        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-
-            @Override
-            public void call(Object... args) {
-            }
-
-        });
 
         return view;
     }
 
     public void openStatusView() {
 
+        //get intent from status fragment
         Intent i = new Intent(getActivity().getBaseContext(),MainActivity.class);
         i.putExtra("Start", "Yes");
         getActivity().startActivity(i);
     }
 
+
+    //check if the device is connected to the internet
     protected boolean isOnline() {
 
         ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -212,6 +224,7 @@ public class FlyFragment extends Fragment {
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
 
+        //check if the connection id wifi or mobile data
         boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 
         return isConnected;

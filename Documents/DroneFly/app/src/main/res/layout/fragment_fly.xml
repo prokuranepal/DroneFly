@@ -18,7 +18,7 @@
 
     <Button
         android:id="@+id/statusButton"
-        android:layout_width="200px"
+        android:layout_width="250px"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/flyButton"
         android:layout_alignStart="@+id/flyButton"
