@@ -178,12 +178,18 @@ public class FlyFragment extends Fragment {
                 public void call(Object... args) {
                 }
 
-            }).on("message", new Emitter.Listener() {
+            }).on("success", new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
 
                     Log.i("INFO",args[0].toString());
+                    final String res = args[0].toString();
+                    getActivity().runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(getContext(), res, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     //Toast.makeText(getContext(), args[0].toString(), Toast.LENGTH_SHORT).show();
 
                 }
