@@ -41,8 +41,8 @@ public class FlyFragment extends Fragment {
     private View view;
     private Button flyButton;
     private Button statusButton;
-    //private final String urlString = "https://nicwebpage.herokuapp.com/android?fly=1";
-    private final String urlString = "http://192.168.1.119:3000";
+    private final String urlString = "https://nicwebpage.herokuapp.com";
+//    private final String urlString = "http://192.168.1.119:3000";
     private String result = "";
     private Socket socket;
 
