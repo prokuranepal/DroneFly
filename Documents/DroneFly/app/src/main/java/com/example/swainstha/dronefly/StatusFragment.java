@@ -38,7 +38,7 @@ public class StatusFragment extends Fragment {
 
         webStatusView.setWebViewClient(new WebViewClient());
 
-        webStatusView.loadUrl("https://nicwebpage.herokuapp.com/status.html");
+        webStatusView.loadUrl("https://nicwebpage.herokuapp.com/status");
 
         //javascript should be enable true to show maps otherwise the maps wont load
         webStatusView.getSettings().setJavaScriptEnabled(true);
