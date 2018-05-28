@@ -1,0 +1,28 @@
+<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/flyFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.swainstha.dronefly.FlyFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <Button
+        android:id="@+id/flyButton"
+        android:layout_width="200px"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="78dp"
+        android:text="FLY" />
+
+    <Button
+        android:id="@+id/statusButton"
+        android:layout_width="250px"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/flyButton"
+        android:layout_alignStart="@+id/flyButton"
+        android:layout_below="@+id/flyButton"
+        android:layout_marginTop="68dp"
+        android:text="STATUS" />
+</android.widget.RelativeLayout>
