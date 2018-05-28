@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.example.swainstha.dronefly.MapsActivity" />
+
+    <Button
+        android:layout_width="70dp"
+        android:layout_height="40dp"
+        android:id="@+id/show"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:text="SHOW" />
+
+    <Button
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:id="@+id/circle"
+        android:layout_toRightOf="@+id/show"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:text="CIRCLE" />
+
+    <EditText
+        android:id="@+id/circle_radius"
+        android:layout_width="80dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_toRightOf="@+id/circle"
+        android:background="@color/white"
+        android:layout_alignBaseline="@+id/circle"
+        android:focusableInTouchMode="true">
+    <requestFocus />
+    </EditText>
+
+    <include android:id="@+id/cell1"
+        android:layout_below="@id/show"
+        android:layout_height="wrap_content"
+        android:layout_width="180dp"
+        layout="@layout/status_list_view" />
+
+
+</android.widget.RelativeLayout>
