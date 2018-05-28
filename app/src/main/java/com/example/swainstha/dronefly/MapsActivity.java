@@ -60,8 +60,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     StatusListAdapter statusListAdapter;
 
     boolean markerChanged = false;
+    boolean makeDronePath = false;
+    boolean loadCurrentPosition = false;
+    boolean firstMissionLoad = true;
 
     JSONObject data;
+    JSONObject mission;
     RelativeLayout relativeLayout;
     boolean showHide = false;
 
@@ -70,14 +74,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Circle circle3;
     Polyline lineH;
     Polyline lineV;
-    Polyline dronePath;
+    ArrayList<Polyline> dronePath;
+    ArrayList<Polyline> missionPath;
     boolean circleUnCirle = false;
 
     Button show;
     Button circle;
     Button fly;
     Button downMission;
+    Button clearMission;
     EditText circleRadius;
+
+    LatLng prevLatLng;
+    LatLng prevLatLngMission;
+    ArrayList<Marker> missionMarker;
+    int missionMarkerindex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +97,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         initSocket();
 
+        missionMarker = new ArrayList<>();
+        dronePath = new ArrayList<>();
+        missionPath = new ArrayList<>();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -173,6 +187,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 SendCommand sendCommand = new SendCommand();
                 try {
                     String res = sendCommand.execute("fly").get();
+                    makeDronePath = true;
                     Log.i("INFO", res);
                 } catch(ExecutionException e) {
                     Log.i("INFO","Execution exception");
@@ -186,15 +201,64 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         downMission.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SendCommand sendCommand = new SendCommand();
+//                SendCommand sendCommand = new SendCommand();
+//                try {
+//                    String res = sendCommand.execute("getMission","1").get();
+//                    Log.i("INFO", res);
+//                } catch(ExecutionException e) {
+//                    Log.i("INFO","Execution exception");
+//                } catch(InterruptedException i) {
+//                    Log.i("INFO","Interrupted exception");
+//                }
+                clearMission();
+                final String res = "{\"0\":{\"lat\":27.686328887939453,\"lng\":85.3176498413086},\"1\":{\"lat\":27.687082290649414,\"lng\":85.31800842285156,\"command\":16,\"alt\":10},\"2\":{\"lat\":27.686342239379883,\"lng\":85.31832885742188,\"command\":16,\"alt\":10},\"3\":{\"lat\":27.68666648864746,\"lng\":85.31977844238281,\"command\":16,\"alt\":10},\"4\":{\"lat\":27.687395095825195,\"lng\":85.32050323486328,\"command\":16,\"alt\":10}}";
+
                 try {
-                    String res = sendCommand.execute("getMission","1").get();
-                    Log.i("INFO", res);
-                } catch(ExecutionException e) {
-                    Log.i("INFO","Execution exception");
-                } catch(InterruptedException i) {
-                    Log.i("INFO","Interrupted exception");
+                    mission = new JSONObject(res);
+                    for(int i=0;i < mission.length();i++){
+                        JSONObject j = mission.getJSONObject(Integer.toString(i));
+                        LatLng latLng = new LatLng(j.getDouble("lat"),j.getDouble("lng"));
+                        if(i == 0) {
+                            missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("TakeOff")
+                                    .icon(BitmapDescriptorFactory.defaultMarker())));
+                        } else if(Integer.parseInt(j.getString("command")) == 16) {
+                            missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("WayPoint " + i).snippet("Alt: " + j.getString("alt"))
+                                    .icon(BitmapDescriptorFactory.defaultMarker())));
+                        } else {
+                            missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("Land")
+                                    .icon(BitmapDescriptorFactory.defaultMarker())));
+                        }
+
+                        if(firstMissionLoad) {
+                            prevLatLngMission = latLng;
+                            firstMissionLoad = false;
+                        }
+
+                        missionPath.add(mMap.addPolyline(new PolylineOptions()
+                                .add(prevLatLngMission, latLng)
+                                .width(1)
+                                .color(Color.RED)));
+
+                        prevLatLngMission = latLng;
+                    }
+
+                } catch(JSONException e) {
+                    Log.i("INFO","Json Exception");
                 }
+            }
+        });
+
+        clearMission = findViewById(R.id.clear_mission);
+        clearMission.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                try {
+//                    dronePath.remove();
+//                }catch(NullPointerException npe) {
+//                    Log.i("INFO","Drone path not defined");
+//                }
+                clearMission();
+
             }
         });
 
@@ -318,6 +382,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
 
                                 statusListAdapter.notifyDataSetChanged();
+                                LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat").toString()),
+                                        Double.parseDouble(data.getString("lon").toString()));
+
+
+                                if(loadCurrentPosition == false) {
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
+                                    loadCurrentPosition = true;
+                                    prevLatLng = currentLatLng;
+                                }
 
                                 if(data.getString("arm").toString() == "true" && markerChanged) {
                                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
@@ -328,13 +401,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
                                 marker.setRotation(Float.parseFloat(data.getString("head").toString()));
 
-                                marker.setPosition(new LatLng(Double.parseDouble(data.getString("lat").toString()),
-                                        Double.parseDouble(data.getString("lon").toString())));
+                                marker.setPosition(currentLatLng);
 
-                                dronePath = mMap.addPolyline(new PolylineOptions()
-                                        .add(new LatLng(, ), new LatLng(, list.get(7)))
-                                        .width(2)
-                                        .color(Color.RED));
+                                if(makeDronePath) {
+                                    dronePath.add(mMap.addPolyline(new PolylineOptions()
+                                            .add(prevLatLng, currentLatLng)
+                                            .width(1)
+                                            .color(Color.RED)));
+                                }
+                                prevLatLng = currentLatLng;
 
                             } catch(JSONException e) {
 
@@ -351,17 +426,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void call(Object... args) {
 
-                    final String res = args[0].toString();
+                    //final String res = args[0].toString();
+                    final String res = "{\"0\":{\"lat\":27.686328887939453,\"lng\":85.3176498413086},\"1\":{\"lat\":27.687082290649414,\"lng\":85.31800842285156,\"command\":16,\"alt\":10},\"2\":{\"lat\":27.686342239379883,\"lng\":85.31832885742188,\"command\":16,\"alt\":10},\"3\":{\"lat\":27.68666648864746,\"lng\":85.31977844238281,\"command\":16,\"alt\":10},\"4\":{\"lat\":27.687395095825195,\"lng\":85.32050323486328,\"command\":16,\"alt\":10}}";
                     Log.i("INFO",res);
-                    try {
-                        JSONObject data = new JSONObject(res);
-                    } catch(JSONException e) {
-                        Log.i("INFO","Json Exception");
-                    }
+
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            Log.i("INFO",res);
+                            try {
+                                mission = new JSONObject(res);
+                                for(int i=0;i < mission.length();i++){
+                                    JSONObject j = mission.getJSONObject(Integer.toString(i));
+                                    LatLng latLng = new LatLng(j.getDouble("lat"),j.getDouble("lng"));
+//                                    if(i == 0) {
+//                                        missionMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("TakeOff ")
+//                                                .icon(BitmapDescriptorFactory.defaultMarker()));
+//                                    } else if(j.getString("command") == "16") {
+//                                        missionMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("WayPoint " + i + "\n" + "alt:" + j.getString("alt") )
+//                                                .icon(BitmapDescriptorFactory.defaultMarker()));
+//                                    } else {
+//                                        missionMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Land")
+//                                                .icon(BitmapDescriptorFactory.defaultMarker()));
+//                                    }
 
+                                    if(firstMissionLoad) {
+                                        prevLatLngMission = latLng;
+                                        firstMissionLoad = false;
+                                    }
+
+                                    missionPath.add(mMap.addPolyline(new PolylineOptions()
+                                                .add(prevLatLngMission, latLng)
+                                                .width(1)
+                                                .color(Color.RED)));
+
+                                    prevLatLngMission = latLng;
+                                }
+
+                            } catch(JSONException e) {
+                                Log.i("INFO","Json Exception");
+                            }
 
                         }
                     });
@@ -424,6 +526,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             //Log.i("INFO",result);
             result = "";
+        }
+    }
+
+    public void clearMission() {
+
+        firstMissionLoad = true;
+        try {
+            for(int i=0;i< missionPath.size();i++) {
+                missionPath.get(i).remove();
+            }
+        }catch(NullPointerException npe) {
+            Log.i("INFO","Mission path not defined");
+        }
+        try {
+            for(int i=0;i< missionMarker.size();i++) {
+                missionMarker.get(i).remove();
+            }
+        }catch(NullPointerException npe) {
+            Log.i("INFO","Mission marker not defined");
         }
     }
 }
