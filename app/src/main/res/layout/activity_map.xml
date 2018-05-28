@@ -39,11 +39,32 @@
         android:layout_alignBaseline="@+id/circle"
         android:focusableInTouchMode="true" />
 
+    <Button
+        android:layout_width="170dp"
+        android:layout_height="40dp"
+        android:id="@+id/download_mission"
+        android:layout_toRightOf="@+id/circle_radius"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:text="Download Mission" />
+
     <include android:id="@+id/cell1"
         android:layout_below="@id/show"
         android:layout_height="wrap_content"
-        android:layout_width="180dp"
+        android:layout_width="200dp"
         layout="@layout/status_list_view" />
+
+    <Button
+        android:id="@+id/fly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="50dp"
+        android:text="FLY"
+        android:textSize="30sp"
+        android:background="@drawable/button_bg_round"/>
 
 
 </android.widget.RelativeLayout>
