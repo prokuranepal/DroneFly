@@ -9,9 +9,11 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -31,6 +33,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.*;
 import org.json.JSONObject;
@@ -62,6 +66,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Circle circle1;
     Circle circle2;
     Circle circle3;
+    Polyline lineH;
+    Polyline lineV;
     boolean circleUnCirle = false;
 
     Button show;
@@ -85,8 +91,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         relativeLayout.setVisibility(View.GONE);
 
         circleRadius = findViewById(R.id.circle_radius);
-        circleRadius.requestFocus();
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         show = findViewById(R.id.show);
         show.setOnClickListener(new View.OnClickListener() {
@@ -108,7 +112,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         circle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("INFO","HIDDEN");
                 if(!circleUnCirle) {
+                    LatLng latLng = new LatLng(27.6862, 85.3149);
                     int radius;
                     try {
                         radius = Integer.parseInt(circleRadius.getText().toString());
@@ -116,23 +122,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         radius = 50;
                     }
                     circle1 = mMap.addCircle(new CircleOptions()
-                            .center(new LatLng(27.6862, 85.3149))
+                            .center(latLng)
                             .radius(radius).strokeWidth(1)
                             .strokeColor(Color.WHITE));
                     circle2 = mMap.addCircle(new CircleOptions()
-                            .center(new LatLng(27.6862, 85.3149))
+                            .center(latLng)
                             .radius(2 * radius).strokeWidth(1)
                             .strokeColor(Color.WHITE));
                     circle3 = mMap.addCircle(new CircleOptions()
-                            .center(new LatLng(27.6862, 85.3149))
+                            .center(latLng)
                             .radius(3 * radius).strokeWidth(1)
                             .strokeColor(Color.WHITE));
+                    Geo geo = new Geo(latLng,3 * radius);
+                    ArrayList<Double> list = geo.calculate();
+                    Log.i("Info",list.toString());
+                    lineH = mMap.addPolyline(new PolylineOptions()
+                            .add(new LatLng(list.get(0), list.get(1)), new LatLng(list.get(4), list.get(5)))
+                            .width(1)
+                            .color(Color.WHITE));
+                    lineV = mMap.addPolyline(new PolylineOptions()
+                            .add(new LatLng(list.get(2), list.get(3)), new LatLng(list.get(6), list.get(7)))
+                            .width(1)
+                            .color(Color.WHITE));
                     circleUnCirle = true;
                     circle.setText("CLEAR");
                 } else {
                     circle1.remove();
                     circle2.remove();
                     circle3.remove();
+                    lineH.remove();
+                    lineV.remove();
                     circleUnCirle = false;
                     circle.setText("CIRCLE");
                 }

@@ -37,9 +37,7 @@
         android:layout_toRightOf="@+id/circle"
         android:background="@color/white"
         android:layout_alignBaseline="@+id/circle"
-        android:focusableInTouchMode="true">
-    <requestFocus />
-    </EditText>
+        android:focusableInTouchMode="true" />
 
     <include android:id="@+id/cell1"
         android:layout_below="@id/show"
