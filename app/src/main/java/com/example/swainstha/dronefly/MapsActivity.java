@@ -40,6 +40,9 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
@@ -85,6 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button clearMission;
     EditText circleRadius;
 
+    LatLng home;
     LatLng prevLatLng;
     LatLng prevLatLngMission;
     ArrayList<Marker> missionMarker;
@@ -134,7 +138,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View view) {
                 Log.i("INFO","HIDDEN");
                 if(!circleUnCirle) {
-                    LatLng latLng = new LatLng(27.6862, 85.3149);
+                    LatLng latLng = home;
                     int radius;
                     try {
                         radius = Integer.parseInt(circleRadius.getText().toString());
@@ -201,50 +205,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         downMission.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                SendCommand sendCommand = new SendCommand();
-//                try {
-//                    String res = sendCommand.execute("getMission","1").get();
-//                    Log.i("INFO", res);
-//                } catch(ExecutionException e) {
-//                    Log.i("INFO","Execution exception");
-//                } catch(InterruptedException i) {
-//                    Log.i("INFO","Interrupted exception");
-//                }
                 clearMission();
-                final String res = "{\"0\":{\"lat\":27.686328887939453,\"lng\":85.3176498413086},\"1\":{\"lat\":27.687082290649414,\"lng\":85.31800842285156,\"command\":16,\"alt\":10},\"2\":{\"lat\":27.686342239379883,\"lng\":85.31832885742188,\"command\":16,\"alt\":10},\"3\":{\"lat\":27.68666648864746,\"lng\":85.31977844238281,\"command\":16,\"alt\":10},\"4\":{\"lat\":27.687395095825195,\"lng\":85.32050323486328,\"command\":16,\"alt\":10}}";
-
+                SendCommand sendCommand = new SendCommand();
                 try {
-                    mission = new JSONObject(res);
-                    for(int i=0;i < mission.length();i++){
-                        JSONObject j = mission.getJSONObject(Integer.toString(i));
-                        LatLng latLng = new LatLng(j.getDouble("lat"),j.getDouble("lng"));
-                        if(i == 0) {
-                            missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("TakeOff")
-                                    .icon(BitmapDescriptorFactory.defaultMarker())));
-                        } else if(Integer.parseInt(j.getString("command")) == 16) {
-                            missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("WayPoint " + i).snippet("Alt: " + j.getString("alt"))
-                                    .icon(BitmapDescriptorFactory.defaultMarker())));
-                        } else {
-                            missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("Land")
-                                    .icon(BitmapDescriptorFactory.defaultMarker())));
-                        }
-
-                        if(firstMissionLoad) {
-                            prevLatLngMission = latLng;
-                            firstMissionLoad = false;
-                        }
-
-                        missionPath.add(mMap.addPolyline(new PolylineOptions()
-                                .add(prevLatLngMission, latLng)
-                                .width(1)
-                                .color(Color.RED)));
-
-                        prevLatLngMission = latLng;
-                    }
-
-                } catch(JSONException e) {
-                    Log.i("INFO","Json Exception");
+                    String res = sendCommand.execute("getMission","{\"mission\":\"1\",\"device\":\"android\"}").get();
+                    Log.i("INFO", res);
+                } catch(ExecutionException e) {
+                    Log.i("INFO","Execution exception");
+                } catch(InterruptedException i) {
+                    Log.i("INFO","Interrupted exception");
                 }
+//                final String res = "{\"0\":{\"lat\":27.686328887939453,\"lng\":85.3176498413086},\"1\":{\"lat\":27.687082290649414,\"lng\":85.31800842285156,\"command\":16,\"alt\":10},\"2\":{\"lat\":27.686342239379883,\"lng\":85.31832885742188,\"command\":16,\"alt\":10},\"3\":{\"lat\":27.68666648864746,\"lng\":85.31977844238281,\"command\":16,\"alt\":10},\"4\":{\"lat\":27.687395095825195,\"lng\":85.32050323486328,\"command\":16,\"alt\":10},\"5\":{\"lat\":27.68668556213379,\"lng\":85.32115936279297,\"command\":16,\"alt\":10},\"6\":{\"lat\":27.686038970947266,\"lng\":85.32144927978516,\"command\":16,\"alt\":10},\"7\":{\"lat\":27.68529510498047,\"lng\":85.32125854492188,\"command\":16,\"alt\":10},\"8\":{\"lat\":27.685609817504883,\"lng\":85.32025146484375,\"command\":16,\"alt\":10},\"9\":{\"lat\":27.685344696044922,\"lng\":85.31883239746094,\"command\":16,\"alt\":10},\"10\":{\"lat\":27.68467903137207,\"lng\":85.31873321533203,\"command\":16,\"alt\":10},\"11\":{\"lat\":27.684364318847656,\"lng\":85.31867980957031,\"command\":16,\"alt\":10},\"12\":{\"lat\":27.68467903137207,\"lng\":85.31807708740234,\"command\":16,\"alt\":10},\"13\":{\"lat\":27.685049057006836,\"lng\":85.31759643554688,\"command\":16,\"alt\":10},\"14\":{\"lat\":27.68475914001465,\"lng\":85.31611633300781,\"command\":16,\"alt\":10},\"15\":{\"lat\":27.683958053588867,\"lng\":85.31551361083984,\"command\":16,\"alt\":10},\"16\":{\"lat\":27.684717178344727,\"lng\":85.31472778320312,\"command\":16,\"alt\":10},\"17\":{\"lat\":27.68563461303711,\"lng\":85.31436157226562,\"command\":16,\"alt\":10},\"18\":{\"lat\":27.686586380004883,\"lng\":85.31474304199219,\"command\":16,\"alt\":10},\"19\":{\"lat\":27.68584632873535,\"lng\":85.3152084350586,\"command\":16,\"alt\":10},\"20\":{\"lat\":27.686010360717773,\"lng\":85.31674194335938,\"command\":16,\"alt\":10},\"21\":{\"lat\":27.686803817749023,\"lng\":85.3167953491211,\"command\":16,\"alt\":10},\"22\":{\"lat\":27.686147689819336,\"lng\":85.31733703613281,\"command\":16,\"alt\":10}}";
+//
+//                try {
+//                    mission = new JSONObject(res);
+//                    for(int i=0;i < mission.length();i++){
+//                        JSONObject j = mission.getJSONObject(Integer.toString(i));
+//                        LatLng latLng = new LatLng(j.getDouble("lat"),j.getDouble("lng"));
+//                        if(i == 0) {
+//                            missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("TakeOff")
+//                                    .icon(BitmapDescriptorFactory.defaultMarker())));
+//                        } else if(Integer.parseInt(j.getString("command")) == 16) {
+//                            missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("WayPoint " + i).snippet("Alt: " + j.getString("alt"))
+//                                    .icon(BitmapDescriptorFactory.defaultMarker())));
+//                        } else {
+//                            missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("Land")
+//                                    .icon(BitmapDescriptorFactory.defaultMarker())));
+//                        }
+//
+//                        if(firstMissionLoad) {
+//                            prevLatLngMission = latLng;
+//                            firstMissionLoad = false;
+//                        }
+//
+//                        missionPath.add(mMap.addPolyline(new PolylineOptions()
+//                                .add(prevLatLngMission, latLng)
+//                                .width(1)
+//                                .color(Color.RED)));
+//
+//                        prevLatLngMission = latLng;
+//                    }
+//
+//                } catch(JSONException e) {
+//                    Log.i("INFO","Json Exception");
+//                }
             }
         });
 
@@ -279,6 +283,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         statusList.add(new StatusData("Status: ","0"));
         statusList.add(new StatusData("LiDar: ","0"));
         statusList.add(new StatusData("Volt: ","0"));
+        statusList.add(new StatusData("Conn: ","0"));
 
         statusListAdapter = new StatusListAdapter(this,statusList);
         LayoutInflater inflater = getLayoutInflater();
@@ -303,12 +308,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng nic = new LatLng(27.6862, 85.3149);
-        marker = mMap.addMarker(new MarkerOptions().position(nic).title("Marker in Kupondole")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.green)).alpha(0.7f).flat(true)
+        home = new LatLng(27.686328887939453, 85.3176498413086);
+        marker = mMap.addMarker(new MarkerOptions().position(home).title("Marker in Kupondole")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.red)).alpha(0.7f).flat(true)
                 .rotation(0.0f));
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nic, 17.0f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, 17.0f));
 
         //Move the camera to the user's location and zoom in!
         //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(nic, 17.0f));
@@ -377,19 +382,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         public void run() {
                             try {
 
-                                for (int i = 0; i < statusList.size(); i++) {
-                                    statusList.get(i).setValue(data.names().get(i).toString());
+                                int i = 0;
+                                Iterator iter = data.keys();
+                                while(iter.hasNext()){
+                                    String key = (String)iter.next();
+                                    String value = data.getString(key);
+                                    statusList.get(i).setValue(value);
+                                    i++;
                                 }
-
+//                                for (int i = 0; i < statusList.size(); i++) {
+//                                    statusList.get(i).setValue(data.names().get(i).toString());
+//                                }
                                 statusListAdapter.notifyDataSetChanged();
                                 LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat").toString()),
-                                        Double.parseDouble(data.getString("lon").toString()));
+                                        Double.parseDouble(data.getString("lng").toString()));
 
 
                                 if(loadCurrentPosition == false) {
                                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
                                     loadCurrentPosition = true;
                                     prevLatLng = currentLatLng;
+                                    home = currentLatLng;
                                 }
 
                                 if(data.getString("arm").toString() == "true" && markerChanged) {
@@ -407,13 +420,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     dronePath.add(mMap.addPolyline(new PolylineOptions()
                                             .add(prevLatLng, currentLatLng)
                                             .width(1)
-                                            .color(Color.RED)));
+                                            .color(Color.GREEN)));
                                 }
                                 prevLatLng = currentLatLng;
 
                             } catch(JSONException e) {
 
                                 Log.i("INFO","Json exception in status data receive");
+                                e.printStackTrace();
 
                             }
                         }
@@ -426,8 +440,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void call(Object... args) {
 
-                    //final String res = args[0].toString();
-                    final String res = "{\"0\":{\"lat\":27.686328887939453,\"lng\":85.3176498413086},\"1\":{\"lat\":27.687082290649414,\"lng\":85.31800842285156,\"command\":16,\"alt\":10},\"2\":{\"lat\":27.686342239379883,\"lng\":85.31832885742188,\"command\":16,\"alt\":10},\"3\":{\"lat\":27.68666648864746,\"lng\":85.31977844238281,\"command\":16,\"alt\":10},\"4\":{\"lat\":27.687395095825195,\"lng\":85.32050323486328,\"command\":16,\"alt\":10}}";
+                    final String res = args[0].toString();
+                    //final String res = "{\"0\":{\"lat\":27.686328887939453,\"lng\":85.3176498413086},\"1\":{\"lat\":27.687082290649414,\"lng\":85.31800842285156,\"command\":16,\"alt\":10},\"2\":{\"lat\":27.686342239379883,\"lng\":85.31832885742188,\"command\":16,\"alt\":10},\"3\":{\"lat\":27.68666648864746,\"lng\":85.31977844238281,\"command\":16,\"alt\":10},\"4\":{\"lat\":27.687395095825195,\"lng\":85.32050323486328,\"command\":16,\"alt\":10}}";
                     Log.i("INFO",res);
 
                     runOnUiThread(new Runnable() {
@@ -437,16 +451,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 for(int i=0;i < mission.length();i++){
                                     JSONObject j = mission.getJSONObject(Integer.toString(i));
                                     LatLng latLng = new LatLng(j.getDouble("lat"),j.getDouble("lng"));
-//                                    if(i == 0) {
-//                                        missionMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("TakeOff ")
-//                                                .icon(BitmapDescriptorFactory.defaultMarker()));
-//                                    } else if(j.getString("command") == "16") {
-//                                        missionMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("WayPoint " + i + "\n" + "alt:" + j.getString("alt") )
-//                                                .icon(BitmapDescriptorFactory.defaultMarker()));
-//                                    } else {
-//                                        missionMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Land")
-//                                                .icon(BitmapDescriptorFactory.defaultMarker()));
-//                                    }
+                                    if(i == 0) {
+                                        missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("TakeOff")
+                                                .icon(BitmapDescriptorFactory.defaultMarker())));
+                                    } else if(Integer.parseInt(j.getString("command")) == 16) {
+                                        missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("WayPoint " + i).snippet("Alt: " + j.getString("alt"))
+                                                .icon(BitmapDescriptorFactory.defaultMarker())));
+                                    } else if (Integer.parseInt(j.getString("command")) == 21){
+                                        missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("Land")
+                                                .icon(BitmapDescriptorFactory.defaultMarker())));
+                                    }
 
                                     if(firstMissionLoad) {
                                         prevLatLngMission = latLng;
@@ -454,9 +468,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     }
 
                                     missionPath.add(mMap.addPolyline(new PolylineOptions()
-                                                .add(prevLatLngMission, latLng)
-                                                .width(1)
-                                                .color(Color.RED)));
+                                            .add(prevLatLngMission, latLng)
+                                            .width(1)
+                                            .color(Color.RED)));
 
                                     prevLatLngMission = latLng;
                                 }
