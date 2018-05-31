@@ -28,7 +28,7 @@
         android:layout_marginLeft="20dp"
         android:text="CIRCLE" />
 
-    <EditText
+    <Spinner
         android:id="@+id/circle_radius"
         android:layout_width="80dp"
         android:layout_height="30dp"
@@ -36,8 +36,18 @@
         android:layout_marginTop="20dp"
         android:layout_toRightOf="@+id/circle"
         android:background="@color/white"
-        android:layout_alignBaseline="@+id/circle"
-        android:focusableInTouchMode="true" />
+        android:layout_alignBaseline="@+id/circle" />
+
+    <!--<EditText-->
+        <!--android:id="@+id/circle_radius"-->
+        <!--android:layout_width="80dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_marginLeft="20dp"-->
+        <!--android:layout_marginTop="20dp"-->
+        <!--android:layout_toRightOf="@+id/circle"-->
+        <!--android:background="@color/white"-->
+        <!--android:layout_alignBaseline="@+id/circle"-->
+        <!--android:focusableInTouchMode="true" />-->
 
     <Button
         android:layout_width="170dp"

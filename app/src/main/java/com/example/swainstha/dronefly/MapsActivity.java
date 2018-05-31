@@ -16,10 +16,12 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -96,7 +98,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button fly;
     Button downMission;
     Button clearMission;
-    EditText circleRadius;
+    Spinner circleSpinner;
+    Integer circleRadius;
 
     LatLng home; //current position
     LatLng prevLatLng;
@@ -150,8 +153,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-        circleRadius = findViewById(R.id.circle_radius);
+        circleSpinner = findViewById(R.id.circle_radius);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.radius_array, android.R.layout.simple_spinner_item);
 
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        circleSpinner.setAdapter(adapter);
+
+        circleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                circleRadius = Integer.parseInt((String) adapterView.getItemAtPosition(i));
+                Log.i("INFO", circleRadius + "");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                circleRadius = 50;
+            }
+        });
         //showing the status
         show = findViewById(R.id.show);
         show.setOnClickListener(new View.OnClickListener() {
@@ -181,7 +205,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     LatLng latLng = home;
                     int radius;
                     try {
-                        radius = Integer.parseInt(circleRadius.getText().toString());
+                        radius = circleRadius;
                     } catch(NumberFormatException e){
                         radius = 50;
                     }
