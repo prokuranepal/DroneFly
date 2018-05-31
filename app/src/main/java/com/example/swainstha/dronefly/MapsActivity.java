@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -50,7 +51,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,CheckListAdapter.PictureClickListener {
 
     private GoogleMap mMap;
     Marker marker;
@@ -59,7 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //    private final String urlString = "http://192.168.1.119:3000";
     private final String urlString = "https://nicwebpage.herokuapp.com";
 
-    ListView statusListView;
+    AdapterView statusListView;
     ArrayList<StatusData> statusList;
     StatusListAdapter statusListAdapter;
 
@@ -71,6 +72,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean makeDronePath = false; //starting making the drone path after the fly command is sent
     boolean loadCurrentPosition = false; //to load the map and position on first receive of status
     boolean firstMissionLoad = true; //to load mission at first to initialize the preLatLngMission
+    boolean flyFlag = false; //to fly only when all the checkboxes are checked by the user
 
     JSONObject data;
     JSONObject mission;
@@ -100,6 +102,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ArrayList<Marker> missionMarker; //for markers of mission waypoints
 
     @Override
+    public void onPictureClick(boolean c){
+
+        if(c)
+            fly.setBackgroundResource(R.drawable.fly_green);
+        else
+            fly.setBackgroundResource((R.drawable.fly_red));
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
@@ -127,6 +139,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         checkListView = this.findViewById(R.id.checkListView);
         relativeLayout2 = this.findViewById(R.id.cell2);
         relativeLayout2.setVisibility(View.GONE);
+
+
 
         circleRadius = findViewById(R.id.circle_radius);
 
@@ -210,15 +224,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fly.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SendCommand sendCommand = new SendCommand();
-                try {
-                    String res = sendCommand.execute("fly","1").get();
-                    makeDronePath = true;
-                    Log.i("INFO", res);
-                } catch(ExecutionException e) {
-                    Log.i("INFO","Execution exception");
-                } catch(InterruptedException i) {
-                    Log.i("INFO","Interrupted exception");
+
+                if(flyFlag) {
+                    SendCommand sendCommand = new SendCommand();
+                    try {
+                        String res = sendCommand.execute("fly", "1").get();
+                        makeDronePath = true;
+                        Log.i("INFO", res);
+                    } catch (ExecutionException e) {
+                        Log.i("INFO", "Execution exception");
+                    } catch (InterruptedException i) {
+                        Log.i("INFO", "Interrupted exception");
+                    }
                 }
             }
         });
@@ -288,13 +305,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         statusListView.setAdapter(statusListAdapter);
 
-        checkList.add(new CheckList("GPS",false));
-        checkList.add(new CheckList("GPS",false));
+        checkList.add(new CheckList("GPS Lock",false));
+        checkList.add(new CheckList("Battery",false));
+        checkList.add(new CheckList("Horizon",false));
+        checkList.add(new CheckList("Mag",false));
 
         checkListAdapter = new CheckListAdapter(this, checkList);
         LayoutInflater inflater1 = getLayoutInflater();
         inflater1.inflate(R.layout.status_list_view, checkListView, false);
         checkListView.setAdapter(checkListAdapter);
+        checkListAdapter.setPictureClickListener(this);
+
     }
 
 

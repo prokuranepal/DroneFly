@@ -3,6 +3,7 @@ package com.example.swainstha.dronefly;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -22,6 +24,19 @@ public class CheckListAdapter extends BaseAdapter {
 
     Context context;
     private ArrayList<CheckList> checkList;
+    private ArrayList<Boolean> boolCheck;
+    private CheckBox checkBox;
+    private boolean check = true;
+
+    public interface PictureClickListener {
+        public void onPictureClick(boolean c);
+    }
+
+    private PictureClickListener listener;
+
+    public void setPictureClickListener(PictureClickListener listener) {
+        this.listener = listener;
+    }
 
     // View lookup cache
     private static class ViewHolder {
@@ -55,15 +70,14 @@ public class CheckListAdapter extends BaseAdapter {
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
         // to add a custom view..
 
         final CheckListAdapter.ViewHolder viewHolder;
-        CheckList checkList= getCheckList(position);
+        final CheckList checkList1= getCheckList(position);
         final View result;
 
-        CheckList checkList1 = getCheckList(position);
         if(convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);;
             convertView = layoutInflater.inflate(R.layout.check_list, parent, false);
@@ -82,7 +96,7 @@ public class CheckListAdapter extends BaseAdapter {
 
         // Set the border of View (ListView Item)
         convertView.setBackground(context.getDrawable(R.drawable.list_border));
-        viewHolder.name.setText(checkList.getName());
+        viewHolder.name.setText(checkList1.getName());
         viewHolder.check.setChecked(checkList1.isCheck());
         viewHolder.check.setTag(position);
 
@@ -91,6 +105,22 @@ public class CheckListAdapter extends BaseAdapter {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 getCheckList((Integer)viewHolder.check.getTag()).setCheck(isChecked);
+                //checkList.add(position,getCheckList(position));
+                check = true;
+                for(CheckList c: checkList) {
+                    if(!c.isCheck()) {
+                        check = false;
+                    }
+
+                }
+
+                Log.i("INFO",check + "");
+
+                if(check == true)
+                    listener.onPictureClick(true);
+                else
+                    listener.onPictureClick(false);
+
 
             }
         });
@@ -101,17 +131,10 @@ public class CheckListAdapter extends BaseAdapter {
 
                 CheckListAdapter.ViewHolder v = (CheckListAdapter.ViewHolder)view.getTag();
 
+
             }
         });
         return convertView;
     }
 
-    ArrayList<CheckList> getBox() {
-        ArrayList<CheckList> box = new ArrayList<CheckList>();
-        for (CheckList p : checkList) {
-            if (p.isCheck())
-                box.add(p);
-        }
-        return box;
-    }
 }

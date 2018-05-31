@@ -79,7 +79,7 @@
         android:layout_marginEnd="50dp"
         android:text="FLY"
         android:textSize="30sp"
-        android:background="@drawable/button_bg_round"/>
+        android:background="@drawable/fly_red"/>
 
 
 </android.widget.RelativeLayout>

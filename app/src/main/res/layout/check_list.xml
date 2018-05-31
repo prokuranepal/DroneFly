@@ -18,7 +18,6 @@
         android:id="@+id/check_box"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_toRightOf="@+id/check_names"
-        android:onClick="onCheckboxClicked"/>
+        android:layout_toRightOf="@+id/check_names" />
 
 </android.widget.RelativeLayout>
