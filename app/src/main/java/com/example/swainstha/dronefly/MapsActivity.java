@@ -63,6 +63,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ArrayList<StatusData> statusList;
     StatusListAdapter statusListAdapter;
 
+    ListView checkListView;
+    ArrayList<CheckList> checkList;
+    CheckListAdapter checkListAdapter;
+
     boolean markerChanged = false; //to change the marker color from red to green on arm and green to red on disarm
     boolean makeDronePath = false; //starting making the drone path after the fly command is sent
     boolean loadCurrentPosition = false; //to load the map and position on first receive of status
@@ -71,6 +75,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     JSONObject data;
     JSONObject mission;
     RelativeLayout relativeLayout;
+    RelativeLayout relativeLayout2;
     boolean showHide = false; //for status button
 
     Circle circle1;
@@ -118,6 +123,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         relativeLayout = findViewById(R.id.cell1);
         relativeLayout.setVisibility(View.GONE);
 
+        checkList = new ArrayList<>();
+        checkListView = this.findViewById(R.id.checkListView);
+        relativeLayout2 = this.findViewById(R.id.cell2);
+        relativeLayout2.setVisibility(View.GONE);
+
         circleRadius = findViewById(R.id.circle_radius);
 
         //showing the status
@@ -127,10 +137,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View view) {
                 if(!showHide) {
                     relativeLayout.setVisibility(View.VISIBLE);
+                    relativeLayout2.setVisibility(View.VISIBLE);
                     show.setText("HIDE");
                     showHide = true;
                 } else {
                     relativeLayout.setVisibility(View.GONE);
+                    relativeLayout2.setVisibility(View.GONE);
                     show.setText("SHOW");
                     showHide = false;
                 }
@@ -275,6 +287,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         inflater.inflate(R.layout.status_list_view,statusListView, false);
 
         statusListView.setAdapter(statusListAdapter);
+
+        checkList.add(new CheckList("GPS",false));
+        checkList.add(new CheckList("GPS",false));
+
+        checkListAdapter = new CheckListAdapter(this, checkList);
+        LayoutInflater inflater1 = getLayoutInflater();
+        inflater1.inflate(R.layout.status_list_view, checkListView, false);
+        checkListView.setAdapter(checkListAdapter);
     }
 
 
