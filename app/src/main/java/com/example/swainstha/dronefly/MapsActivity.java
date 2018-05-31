@@ -1,12 +1,14 @@
 package com.example.swainstha.dronefly;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -101,13 +103,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LatLng prevLatLngMission;
     ArrayList<Marker> missionMarker; //for markers of mission waypoints
 
+    AlertDialog.Builder builder; //dialog builder to ask for confirmation after fly button is pressed
+
     @Override
     public void onPictureClick(boolean c){
 
-        if(c)
+        if(c) {
             fly.setBackgroundResource(R.drawable.fly_green);
-        else
+            flyFlag = true;
+        }
+        else {
             fly.setBackgroundResource((R.drawable.fly_red));
+            flyFlag = false;
+        }
     }
 
 
@@ -226,16 +234,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View view) {
 
                 if(flyFlag) {
-                    SendCommand sendCommand = new SendCommand();
-                    try {
-                        String res = sendCommand.execute("fly", "1").get();
-                        makeDronePath = true;
-                        Log.i("INFO", res);
-                    } catch (ExecutionException e) {
-                        Log.i("INFO", "Execution exception");
-                    } catch (InterruptedException i) {
-                        Log.i("INFO", "Interrupted exception");
-                    }
+                    AlertDialog alert = builder.create();
+                    alert.show();
+
+                } else {
+                    Toast.makeText(MapsActivity.this, "Make sure all checks are completed", Toast.LENGTH_SHORT).show();
+
                 }
             }
         });
@@ -277,6 +281,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                }
                 clearMission();
 
+            }
+        });
+
+        //crating a dialog box to confirm fly
+        builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Confirm");
+        builder.setMessage("Are you sure?");
+
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                SendCommand sendCommand = new SendCommand();
+                try {
+                    String res = sendCommand.execute("fly", "1").get();
+                    makeDronePath = true;
+                    Log.i("INFO", res);
+                } catch (ExecutionException e) {
+                    Log.i("INFO", "Execution exception");
+                } catch (InterruptedException i) {
+                    Log.i("INFO", "Interrupted exception");
+                }
+            }
+        });
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Do nothing
+                dialog.dismiss();
             }
         });
 
