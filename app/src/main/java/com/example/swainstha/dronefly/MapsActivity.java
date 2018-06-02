@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -71,6 +72,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ListView checkListView;
     ArrayList<CheckList> checkList;
     CheckListAdapter checkListAdapter;
+
+    ListView idListView;
+    ArrayList<IdList> idList;
+    IdListAdapter idListAdapter;
 
     boolean markerChanged = false; //to change the marker color from red to green on arm and green to red on disarm
     boolean makeDronePath = false; //starting making the drone path after the fly command is sent
@@ -151,6 +156,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         relativeLayout2 = this.findViewById(R.id.cell2);
         relativeLayout2.setVisibility(View.GONE);
 
+        idList = new ArrayList<>();
+        idListView = this.findViewById(R.id.idListView);
 
 
         circleSpinner = findViewById(R.id.circle_radius);
@@ -372,9 +379,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         checkListAdapter = new CheckListAdapter(this, checkList);
         LayoutInflater inflater1 = getLayoutInflater();
-        inflater1.inflate(R.layout.status_list_view, checkListView, false);
+        ViewGroup header = (ViewGroup) inflater1.inflate(R.layout.check_list_header,
+                checkListView, false);
+        checkListView.addHeaderView(header);
         checkListView.setAdapter(checkListAdapter);
         checkListAdapter.setPictureClickListener(this);
+
+        idList.add(new IdList("Drone Id: ","0"));
+        idList.add(new IdList("Mission Id: ","0"));
+        idList.add(new IdList("Flight Time: ","0"));
+
+        idListAdapter = new IdListAdapter(this, idList);
+        LayoutInflater inflater2 = getLayoutInflater();
+        inflater2.inflate(R.layout.id_list_view,idListView, false);
+        idListView.setAdapter(idListAdapter);
 
     }
 

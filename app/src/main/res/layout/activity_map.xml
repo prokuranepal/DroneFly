@@ -73,12 +73,22 @@
         android:layout_width="200dp"
         layout="@layout/status_list_view" />
 
-
-
-    <include android:id="@+id/cell2"
+    <include android:id="@+id/cell3"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="10dp"
         android:layout_alignParentRight="true"
         android:layout_height="wrap_content"
+        android:layout_width="200dp"
+        layout="@layout/id_list_view" />
+
+    <include android:id="@+id/cell2"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/cell3"
+        android:layout_height="wrap_content"
         android:layout_width="150dp"
+        android:layout_alignLeft="@+id/cell3"
         layout="@layout/check_list_view" />
 
     <Button
