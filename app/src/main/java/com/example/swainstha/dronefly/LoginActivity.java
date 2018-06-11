@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     String url = "http://192.168.1.119:3000/android/";
     Spinner username;
     String user_name;
-    String[] items = new String[]{"nicdrone", "nicpulchowk", "nicnangi","fusedrone","airbus","boeing","jet"};
+    String[] items = new String[]{"nicdrone", "nicpulchowk", "nicnangi","fusedrone","airbus","boeing","jet","admin"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -178,6 +178,10 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                 break;
             case 6:
                 user_name="jet";
+                break;
+            case 7:
+                user_name="Admin";
+                break;
 
         }
     }
