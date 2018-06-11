@@ -61,9 +61,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     Marker marker;
     private Socket socket;
-
+    String place;
 //    private final String urlString = "http://192.168.1.119:3000";
-    private final String urlString = "https://nicwebpage.herokuapp.com";
+    private final String urlString = "https://nicwebpage.herokuapp.com/";
 
     AdapterView statusListView;
     ArrayList<StatusData> statusList;
@@ -131,6 +131,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        place=getIntent().getStringExtra("place");
+
 
         //initialize socket by sending joinAndroid event
         initSocket();
@@ -439,7 +441,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Random rand = new Random();
             int  id = rand.nextInt(50) + 1;
 
-            socket = IO.socket(urlString); //specifying the url
+
+
+            place=place.replace("nic","");
+            Toast.makeText(getApplicationContext(),urlString+place,Toast.LENGTH_SHORT).show();
+            //socket = manager.socket(place); //specifying the url
+            if(place.equals("nicdrone")) {
+                socket = IO.socket(urlString);
+            }
+            else socket =IO.socket(urlString+place);
             socket.connect(); //connecting to the server
 
             SendCommand sendCommand = new SendCommand();

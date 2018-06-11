@@ -3,7 +3,9 @@ package com.example.swainstha.dronefly;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -36,6 +38,8 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+import static com.example.swainstha.dronefly.R.color.white;
+
 public class LoginActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     ImageView imageView;
@@ -52,7 +56,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     String url = "http://192.168.1.119:3000/android/";
     Spinner username;
     String user_name;
-    String[] items = new String[]{"nicdrone", "fusedrone", "innovationdrone","tesladrone","logpointdrone","airbus","boeing","jet"};
+    String[] items = new String[]{"nicdrone", "nicpulchowk", "nicnangi","fusedrone","airbus","boeing","jet"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -60,10 +64,12 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         setContentView(R.layout.activity_login);
         queue = Volley.newRequestQueue(this);
         username = findViewById(R.id.spinner1);
-
+        username.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary),PorterDuff.Mode.SRC_ATOP);
+        //username.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+     //   username.getBackground().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 
 // Request a string response from the provided URL.
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, items);
 
         username.setAdapter(adapter);
         username.setOnItemSelectedListener(this);
@@ -89,7 +95,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
 
     public void signUpSignInOption() {
-        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+        i.putExtra("place",user_name);
         startActivity(i);
 
     }
@@ -155,13 +162,13 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                 user_name="nicdrone";
                 break;
             case 1:
-                user_name="innovationdrone";
+                user_name="nicpulchowk";
                 break;
             case 2:
-                user_name="tesladrone";
+                user_name="nicnangi";
                 break;
             case 3:
-                user_name="logpointdrone";
+                user_name="nicfusedrone";
                 break;
             case 4:
                 user_name="airbus";
