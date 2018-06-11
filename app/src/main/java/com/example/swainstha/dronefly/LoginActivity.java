@@ -48,6 +48,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     Button sign;
     JSONObject user_detail = new JSONObject();
     Toolbar toolbar;
+    String access_type;
     Socket socket;
     //private String urlString = "http://192.168.1.119:3001";
     boolean connection_flag = false;
@@ -56,7 +57,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     String url = "http://192.168.1.119:3000/android/";
     Spinner username;
     String user_name;
-    String[] items = new String[]{"nicdrone", "nicpulchowk", "nicnangi","fusedrone","airbus","boeing","jet","admin"};
+    String[] items = new String[]{"ADMIN", "NICPULCHOWK", "NICNANGI","NICRAMCHE","AIRBUS","BOEING","JET"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -97,6 +98,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     public void signUpSignInOption() {
         Intent i = new Intent(getApplicationContext(), MapsActivity.class);
         i.putExtra("place",user_name);
+        i.putExtra("access_type",access_type);
         startActivity(i);
 
     }
@@ -160,27 +162,35 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         switch(i){
             case 0:
                 user_name="nicdrone";
+                access_type="root";
                 break;
             case 1:
                 user_name="nicpulchowk";
+                access_type="normal";
                 break;
             case 2:
                 user_name="nicnangi";
+                access_type="normal";
                 break;
             case 3:
-                user_name="nicfusedrone";
+                user_name="nicramche";
+                access_type="normal";
                 break;
             case 4:
                 user_name="airbus";
+                access_type="normal";
                 break;
             case 5:
                 user_name="boeing";
+                access_type="normal";
                 break;
             case 6:
                 user_name="jet";
+                access_type="normal";
                 break;
             case 7:
                 user_name="Admin";
+                access_type="normal";
                 break;
 
         }
