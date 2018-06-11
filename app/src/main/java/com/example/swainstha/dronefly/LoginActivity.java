@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     String url = "http://192.168.1.119:3000/android/";
     Spinner username;
     String user_name;
-    String[] items = new String[]{"ADMIN", "NICPULCHOWK", "NICNANGI","NICRAMCHE","AIRBUS","BOEING","JET"};
+    String[] items = new String[]{"ADMIN", "NICPULCHOWK", "NICNANGI","NICRAMCHE","NICKHOKANA","NICDHARAN","NICBENI"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -98,7 +98,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     public void signUpSignInOption() {
         Intent i = new Intent(getApplicationContext(), MapsActivity.class);
         i.putExtra("place",user_name);
-        i.putExtra("access_type",access_type);
+        access_type = access_type.substring(0,1).toUpperCase() + access_type.substring(1).toLowerCase();
+        i.putExtra("access",access_type);
         startActivity(i);
 
     }
@@ -159,40 +160,12 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        switch(i){
-            case 0:
-                user_name="nicdrone";
-                access_type="root";
-                break;
-            case 1:
-                user_name="nicpulchowk";
-                access_type="normal";
-                break;
-            case 2:
-                user_name="nicnangi";
-                access_type="normal";
-                break;
-            case 3:
-                user_name="nicramche";
-                access_type="normal";
-                break;
-            case 4:
-                user_name="airbus";
-                access_type="normal";
-                break;
-            case 5:
-                user_name="boeing";
-                access_type="normal";
-                break;
-            case 6:
-                user_name="jet";
-                access_type="normal";
-                break;
-            case 7:
-                user_name="Admin";
-                access_type="normal";
-                break;
 
+        user_name = adapterView.getItemAtPosition(i).toString().toLowerCase();
+        if(user_name.equals("admin")) {
+            access_type = "root";
+        } else{
+            access_type = "normal";
         }
     }
 

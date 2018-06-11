@@ -132,6 +132,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         place=getIntent().getStringExtra("place");
+        String access = getIntent().getStringExtra("access");
+        place=place.replace("nic","");
 
 
         //initialize socket by sending joinAndroid event
@@ -390,6 +392,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         idList.add(new IdList("Drone Id: ","0"));
         idList.add(new IdList("Mission Id: ","0"));
         idList.add(new IdList("Flight Time: ","0"));
+        idList.add(new IdList("Access: ",access));
 
         idListAdapter = new IdListAdapter(this, idList);
         LayoutInflater inflater2 = getLayoutInflater();
@@ -442,14 +445,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int  id = rand.nextInt(50) + 1;
 
 
-
-            place=place.replace("nic","");
             Toast.makeText(getApplicationContext(),urlString+place,Toast.LENGTH_SHORT).show();
             //socket = manager.socket(place); //specifying the url
-            if(place.equals("nicdrone")) {
+            if(place.equals("admin")) {
                 socket = IO.socket(urlString);
             }
-            else socket =IO.socket(urlString+place);
+            else {
+                socket =IO.socket(urlString+place);
+            }
+
             socket.connect(); //connecting to the server
 
             SendCommand sendCommand = new SendCommand();

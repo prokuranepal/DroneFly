@@ -12,28 +12,50 @@
         tools:context="com.example.swainstha.dronefly.MapsActivity" />
 
     <Button
+        android:layout_width="170dp"
+        android:layout_height="40dp"
+        android:id="@+id/download_mission"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="Download Mission" />
+
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:id="@+id/clear_mission"
+        android:layout_toRightOf="@+id/download_mission"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="Clear Mission" />
+
+    <Button
         android:layout_width="70dp"
         android:layout_height="40dp"
         android:id="@+id/show"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/download_mission"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
         android:text="SHOW" />
 
     <Button
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:id="@+id/circle"
+        android:layout_below="@+id/download_mission"
         android:layout_toRightOf="@+id/show"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
         android:text="CIRCLE" />
 
     <Spinner
         android:id="@+id/circle_radius"
         android:layout_width="80dp"
         android:layout_height="30dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/clear_mission"
         android:layout_toRightOf="@+id/circle"
         android:background="@color/white"
         android:layout_alignBaseline="@+id/circle" />
@@ -48,24 +70,6 @@
         <!--android:background="@color/white"-->
         <!--android:layout_alignBaseline="@+id/circle"-->
         <!--android:focusableInTouchMode="true" />-->
-
-    <Button
-        android:layout_width="170dp"
-        android:layout_height="40dp"
-        android:id="@+id/download_mission"
-        android:layout_toRightOf="@+id/circle_radius"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:text="Download Mission" />
-
-    <Button
-        android:layout_width="150dp"
-        android:layout_height="40dp"
-        android:id="@+id/clear_mission"
-        android:layout_toRightOf="@+id/download_mission"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:text="Clear Mission" />
 
     <include android:id="@+id/cell1"
         android:layout_below="@id/show"
