@@ -2,6 +2,7 @@ package com.example.swainstha.dronefly;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -9,6 +10,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -62,8 +64,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Marker marker;
     private Socket socket;
     String place;
-//    private final String urlString = "http://192.168.1.119:3000";
-    private final String urlString = "https://nicwebpage.herokuapp.com/";
+    String destination = "";
+    private final String urlString = "http://192.168.1.119:3000";
+//    private final String urlString = "https://nicwebpage.herokuapp.com/";
 
     AdapterView statusListView;
     ArrayList<StatusData> statusList;
@@ -79,9 +82,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     boolean markerChanged = false; //to change the marker color from red to green on arm and green to red on disarm
     boolean makeDronePath = false; //starting making the drone path after the fly command is sent
+    boolean makeDronePathS = false;
     boolean loadCurrentPosition = false; //to load the map and position on first receive of status
     boolean firstMissionLoad = true; //to load mission at first to initialize the preLatLngMission
     boolean flyFlag = false; //to fly only when all the checkboxes are checked by the user
+    boolean simulateMission = false; //for simulation or mission
+    boolean cancelSimulation = false; //for cancelling simulation and show simulate or cancel
 
     JSONObject data;
     JSONObject mission;
@@ -103,8 +109,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button fly;
     Button downMission;
     Button clearMission;
+    Button sendMission;
+    Button simulate;
     Spinner circleSpinner;
+    Spinner destinationSpinner;
     Integer circleRadius;
+
 
     LatLng home; //current position
     LatLng prevLatLng;
@@ -131,9 +141,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         place=getIntent().getStringExtra("place");
         String access = getIntent().getStringExtra("access");
-        place=place.replace("nic","");
+        if(place != null) {
+            place = place.replace("nic", "");
+        } else {
+            place = "Dharan";
+        }
 
 
         //initialize socket by sending joinAndroid event
@@ -187,6 +202,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 circleRadius = 50;
             }
         });
+
+        destinationSpinner = findViewById(R.id.destination);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> destinationAdapter = ArrayAdapter.createFromResource(this,
+                R.array.destination_array, android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        destinationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        destinationSpinner.setAdapter(destinationAdapter);
+
+        destinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                destination = adapterView.getItemAtPosition(i).toString();
+                idList.get(5).setValue(destination);
+                idListAdapter.notifyDataSetChanged();
+                builder.setTitle("FLight from " + place + " to " + destination + ".");
+                Toast.makeText(getApplicationContext(), place + " to " + destination, Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                destination = "Ramche";
+                Toast.makeText(getApplicationContext(), place + " to " + destination, Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
         //showing the status
         show = findViewById(R.id.show);
         show.setOnClickListener(new View.OnClickListener() {
@@ -319,10 +365,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        sendMission = findViewById(R.id.sendMission);
+        sendMission.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                SendCommand sendCommand = new SendCommand();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.accumulate("file", place.toLowerCase() + destination.substring(0,1).toUpperCase() + destination.substring(1).toLowerCase());
+                    Log.i("file",jsonObject.toString());
+                } catch(JSONException je) {
+                    je.printStackTrace();
+                }
+                sendCommand.execute("positions",jsonObject.toString());
+                Log.i("Send", place + " " + destination);
+            }
+        });
+
+        simulate = findViewById(R.id.simulate);
+        simulate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(!cancelSimulation) {
+                    makeDronePathS = true;
+                    clearMission();
+                    SendCommand sendCommand = new SendCommand();
+                    sendCommand.execute("simulate","");
+                    simulate.setText("Cancel");
+                    cancelSimulation = true;
+                    simulateMission = true;
+                } else {
+                    makeDronePathS = false;
+                    simulate.setText("Simulate");
+                    cancelSimulation = false;
+                    simulateMission = false;
+                }
+                
+            }
+        });
+
         //crating a dialog box to confirm fly
         builder = new AlertDialog.Builder(this);
 
-        builder.setTitle("Confirm");
+        builder.setTitle("FLight from " + place + " to " + destination + ".");
         builder.setMessage("Are you sure?");
 
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
@@ -330,7 +417,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(DialogInterface dialog, int which) {
                 SendCommand sendCommand = new SendCommand();
                 try {
-                    String res = sendCommand.execute("fly", "1").get();
+                    String res = sendCommand.execute("fly","1").get();
                     makeDronePath = true;
                     Log.i("INFO", res);
                 } catch (ExecutionException e) {
@@ -368,6 +455,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         statusList.add(new StatusData("Status: ","0"));
         statusList.add(new StatusData("LiDar: ","0"));
         statusList.add(new StatusData("Volt: ","0"));
+        statusList.add(new StatusData("Est","0"));
         statusList.add(new StatusData("Conn: ","0"));
 
         statusListAdapter = new StatusListAdapter(this,statusList);
@@ -380,6 +468,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         checkList.add(new CheckList("Battery",false));
         checkList.add(new CheckList("Horizon",false));
         checkList.add(new CheckList("Mag",false));
+        checkList.add(new CheckList("Flight Plan", false));
 
         checkListAdapter = new CheckListAdapter(this, checkList);
         LayoutInflater inflater1 = getLayoutInflater();
@@ -393,6 +482,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         idList.add(new IdList("Mission Id: ","0"));
         idList.add(new IdList("Flight Time: ","0"));
         idList.add(new IdList("Access: ",access));
+        idList.add(new IdList("Home: ",place.substring(0,1).toUpperCase() + place.substring(1).toLowerCase()));
+        idList.add(new IdList("Destination: ",destination));
 
         idListAdapter = new IdListAdapter(this, idList);
         LayoutInflater inflater2 = getLayoutInflater();
@@ -436,23 +527,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         try {
 
             //check for internet connection
-            if(!isOnline()) {
+            if (!isOnline()) {
                 throw new Exception();
             }
 
             //generating a random number for join id in the server
             Random rand = new Random();
-            int  id = rand.nextInt(50) + 1;
+            int id = rand.nextInt(50) + 1;
 
 
-            Toast.makeText(getApplicationContext(),urlString+place,Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), urlString + place, Toast.LENGTH_SHORT).show();
             //socket = manager.socket(place); //specifying the url
-            if(place.equals("admin")) {
+//            if (place.equals("admin")) {
                 socket = IO.socket(urlString);
-            }
-            else {
-                socket =IO.socket(urlString+place);
-            }
+//            } else {
+//                socket = IO.socket(urlString + place);
+//            }
 
             socket.connect(); //connecting to the server
 
@@ -460,19 +550,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             try {
 
                 //check for internet connectivity
-                if(!isOnline()) {
+                if (!isOnline()) {
                     throw new Exception();
                 }
 
                 //execute worker thread to send data
-                sendCommand.execute("joinAndroid","").get();
+                sendCommand.execute("joinAndroid", "1").get();
 
-            }catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
-                Log.i("INFO","Failed Sending");
+                Log.i("INFO", "Failed Sending");
             } catch (ExecutionException e) {
                 e.printStackTrace();
-                Log.i("INFO","Failed Sending");
+                Log.i("INFO", "Failed Sending");
             }
 
             //callback functions for socket connected, message received and socket disconnected
@@ -488,75 +578,77 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void call(Object... args) {
 
-                    final String res = args[0].toString();
-                    Log.i("INFO",res);
+                    if (!simulateMission) {
 
-                    try {
-                        data = new JSONObject(res);
-                    } catch(JSONException e) {
-                        Log.i("INFO","Json Exception");
-                    }
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            try {
+                        final String res = args[0].toString();
+                        Log.i("INFO", res);
 
-                                int i = 0;
-                                Iterator iter = data.keys();
-                                while(iter.hasNext()){
-                                    String key = (String)iter.next();
-                                    String value = data.getString(key);
-                                    statusList.get(i).setValue(value);
-                                    i++;
-                                }
+                        try {
+                            data = new JSONObject(res);
+                        } catch (JSONException e) {
+                            Log.i("INFO", "Json Exception");
+                        }
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                try {
+
+                                    int i = 0;
+                                    Iterator iter = data.keys();
+                                    while (iter.hasNext()) {
+                                        String key = (String) iter.next();
+                                        String value = data.getString(key);
+                                        statusList.get(i).setValue(value);
+                                        i++;
+                                    }
 //                                for (int i = 0; i < statusList.size(); i++) {
 //                                    statusList.get(i).setValue(data.names().get(i).toString());
 //                                }
-                                statusListAdapter.notifyDataSetChanged();
-                                LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat").toString()),
-                                        Double.parseDouble(data.getString("lng").toString()));
+                                    statusListAdapter.notifyDataSetChanged();
+                                    LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat").toString()),
+                                            Double.parseDouble(data.getString("lng").toString()));
 
 
-                                //load the map and current position on first receive of `
-                                if(loadCurrentPosition == false) {
-                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
-                                    loadCurrentPosition = true;
+                                    //load the map and current position on first receive of `
+                                    if (loadCurrentPosition == false) {
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
+                                        loadCurrentPosition = true;
+                                        prevLatLng = currentLatLng;
+                                        home = currentLatLng;
+                                    }
+
+                                    //change color of markers based on arm
+                                    if (data.getString("arm").toString() == "true" && markerChanged) {
+                                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
+                                        markerChanged = false;
+                                    } else if (data.getString("arm").toString() == "false" && !markerChanged) {
+                                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
+                                        markerChanged = true;
+                                    }
+
+                                    //set the rotation based on heading
+                                    marker.setRotation(Float.parseFloat(data.getString("head").toString()));
+
+                                    //set the location
+                                    marker.setPosition(currentLatLng);
+
+                                    //start making the flight path after the fly command is sent
+                                    if (makeDronePath) {
+                                        dronePath.add(mMap.addPolyline(new PolylineOptions()
+                                                .add(prevLatLng, currentLatLng)
+                                                .width(1)
+                                                .color(Color.GREEN)));
+                                    }
                                     prevLatLng = currentLatLng;
-                                    home = currentLatLng;
+
+                                } catch (JSONException e) {
+
+                                    Log.i("INFO", "Json exception in status data receive");
+                                    e.printStackTrace();
                                 }
-
-                                //change color of markers based on arm
-                                if(data.getString("arm").toString() == "true" && markerChanged) {
-                                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
-                                    markerChanged = false;
-                                } else if(data.getString("arm").toString() == "false" && !markerChanged){
-                                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
-                                    markerChanged = true;
-                                }
-
-                                //set the rotation based on heading
-                                marker.setRotation(Float.parseFloat(data.getString("head").toString()));
-
-                                //set the location
-                                marker.setPosition(currentLatLng);
-
-                                //start making the flight path after the fly command is sent
-                                if(makeDronePath) {
-                                    dronePath.add(mMap.addPolyline(new PolylineOptions()
-                                            .add(prevLatLng, currentLatLng)
-                                            .width(1)
-                                            .color(Color.GREEN)));
-                                }
-                                prevLatLng = currentLatLng;
-
-                            } catch(JSONException e) {
-
-                                Log.i("INFO","Json exception in status data receive");
-                                e.printStackTrace();
-
                             }
-                        }
-                    });
-                    //Toast.makeText(getContext(), args[0].toString(), Toast.LENGTH_SHORT).show();
+                        });
+                        //Toast.makeText(getContext(), args[0].toString(), Toast.LENGTH_SHORT).show();
+                    }
                 }
 
             }).on("Mission", new Emitter.Listener() {
@@ -566,29 +658,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     final String res = args[0].toString();
                     //final String res = "{\"0\":{\"lat\":27.686328887939453,\"lng\":85.3176498413086},\"1\":{\"lat\":27.687082290649414,\"lng\":85.31800842285156,\"command\":16,\"alt\":10},\"2\":{\"lat\":27.686342239379883,\"lng\":85.31832885742188,\"command\":16,\"alt\":10},\"3\":{\"lat\":27.68666648864746,\"lng\":85.31977844238281,\"command\":16,\"alt\":10},\"4\":{\"lat\":27.687395095825195,\"lng\":85.32050323486328,\"command\":16,\"alt\":10}}";
-                    Log.i("INFO",res);
+                    Log.i("INFO", res);
 
                     runOnUiThread(new Runnable() {
                         public void run() {
                             try {
                                 mission = new JSONObject(res);
                                 //getting mission and adding title and snippet based on command number
-                                for(int i=0;i < mission.length();i++){
+                                for (int i = 0; i < mission.length(); i++) {
                                     JSONObject j = mission.getJSONObject(Integer.toString(i));
-                                    LatLng latLng = new LatLng(j.getDouble("lat"),j.getDouble("lng"));
-                                    if(i == 0) {
+                                    LatLng latLng = new LatLng(j.getDouble("lat"), j.getDouble("lng"));
+                                    if (i == 0) {
                                         missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("TakeOff")
                                                 .icon(BitmapDescriptorFactory.defaultMarker())));
-                                    } else if(Integer.parseInt(j.getString("command")) == 16) {
+                                    } else if (Integer.parseInt(j.getString("command")) == 16) {
                                         missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("WayPoint " + i).snippet("Alt: " + j.getString("alt"))
                                                 .icon(BitmapDescriptorFactory.defaultMarker())));
-                                    } else if (Integer.parseInt(j.getString("command")) == 21){
+                                    } else if (Integer.parseInt(j.getString("command")) == 21) {
                                         missionMarker.add(mMap.addMarker(new MarkerOptions().position(latLng).title("Land")
                                                 .icon(BitmapDescriptorFactory.defaultMarker())));
                                     }
 
                                     //checking for first mission command
-                                    if(firstMissionLoad) {
+                                    if (firstMissionLoad) {
                                         prevLatLngMission = latLng;
                                         firstMissionLoad = false;
                                     }
@@ -602,8 +694,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     prevLatLngMission = latLng;
                                 }
 
-                            } catch(JSONException e) {
-                                Log.i("INFO","Json Exception");
+                            } catch (JSONException e) {
+                                Log.i("INFO", "Json Exception");
                             }
 
                         }
@@ -611,7 +703,83 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //Toast.makeText(getContext(), args[0].toString(), Toast.LENGTH_SHORT).show();
                 }
 
-            }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+            }).on("simulateData", new Emitter.Listener() {
+
+                @Override
+                public void call(Object... args) {
+                    if (simulateMission) {
+                        Log.i("SimulateData", args[0].toString());
+                        final String res = args[0].toString();
+
+                        try {
+                            data = new JSONObject(res);
+                        } catch (JSONException e) {
+                            Log.i("INFO", "Json Exception");
+                        }
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                try {
+
+                                    int i = 0;
+                                    Iterator iter = data.keys();
+                                    while (iter.hasNext()) {
+                                        String key = (String) iter.next();
+                                        String value = data.getString(key);
+                                        statusList.get(i).setValue(value);
+                                        i++;
+                                    }
+//                                for (int i = 0; i < statusList.size(); i++) {
+//                                    statusList.get(i).setValue(data.names().get(i).toString());
+//                                }
+                                    statusListAdapter.notifyDataSetChanged();
+                                    LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat").toString()),
+                                            Double.parseDouble(data.getString("lng").toString()));
+
+
+                                    //load the map and current position on first receive of `
+                                    if (loadCurrentPosition == false) {
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
+                                        loadCurrentPosition = true;
+                                        prevLatLng = currentLatLng;
+                                        home = currentLatLng;
+                                    }
+
+                                    //change color of markers based on arm
+                                    if (data.getString("arm").toString() == "true" && markerChanged) {
+                                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
+                                        markerChanged = false;
+                                    } else if (data.getString("arm").toString() == "false" && !markerChanged) {
+                                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
+                                        markerChanged = true;
+                                    }
+
+                                    //set the rotation based on heading
+                                    marker.setRotation(Float.parseFloat(data.getString("head").toString()));
+
+                                    //set the location
+                                    marker.setPosition(currentLatLng);
+
+                                    //start making the flight path after the fly command is sent
+                                    if (makeDronePathS) {
+                                        dronePath.add(mMap.addPolyline(new PolylineOptions()
+                                                .add(prevLatLng, currentLatLng)
+                                                .width(1)
+                                                .color(Color.GREEN)));
+                                    }
+                                    prevLatLng = currentLatLng;
+
+                                } catch (JSONException e) {
+
+                                    Log.i("INFO", "Json exception in status data receive");
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        //Toast.makeText(getContext(), args[0].toString(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
@@ -652,7 +820,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             try {
                 //sending message to server
                 socket.emit(urls[0],urls[1]);
-                Log.i("INFO",urls[0]+urls[1]);
+                Log.i("INFO",urls[0] + urls[1]);
                 return "Success";
 
             } catch (Exception e) {

@@ -26,9 +26,39 @@
         android:layout_height="40dp"
         android:id="@+id/clear_mission"
         android:layout_toRightOf="@+id/download_mission"
+        android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:text="Clear Mission" />
+
+    <Spinner
+        android:id="@+id/destination"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/clear_mission"
+        android:layout_toRightOf="@+id/clear_mission"
+        android:background="@color/white"
+        android:layout_alignBaseline="@+id/clear_mission" />
+
+    <Button
+        android:id="@+id/sendMission"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/destination"
+        android:text="Send" />
+
+    <Button
+        android:id="@+id/simulate"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/sendMission"
+        android:text="Simulate" />
 
     <Button
         android:layout_width="70dp"
