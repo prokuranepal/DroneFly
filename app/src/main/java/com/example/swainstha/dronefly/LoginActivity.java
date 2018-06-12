@@ -163,6 +163,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
         user_name = adapterView.getItemAtPosition(i).toString().toLowerCase();
         if(user_name.equals("admin")) {
+            user_name="nicdrone";
             access_type = "root";
         } else{
             access_type = "normal";

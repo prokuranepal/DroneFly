@@ -65,8 +65,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Socket socket;
     String place;
     String destination = "";
-    private final String urlString = "http://192.168.1.119:3000";
-//    private final String urlString = "https://nicwebpage.herokuapp.com/";
+    String mode = "Real";
+//    private final String urlString = "http://192.168.1.119:3000";
+    private final String urlString = "https://nicwebpage.herokuapp.com/";
 
     AdapterView statusListView;
     ArrayList<StatusData> statusList;
@@ -396,13 +397,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     simulate.setText("Cancel");
                     cancelSimulation = true;
                     simulateMission = true;
+                    mode = "Simulation";
+                    idList.get(4).setValue(mode);
+                    idListAdapter.notifyDataSetChanged();
                 } else {
+                    SendCommand sendCommand = new SendCommand();
+                    sendCommand.execute("cancelSimulate","");
                     makeDronePathS = false;
                     simulate.setText("Simulate");
                     cancelSimulation = false;
                     simulateMission = false;
+                    mode = "Real";
+                    idList.get(4).setValue(mode);
+                    idListAdapter.notifyDataSetChanged();
                 }
-                
+
             }
         });
 
@@ -482,6 +491,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         idList.add(new IdList("Mission Id: ","0"));
         idList.add(new IdList("Flight Time: ","0"));
         idList.add(new IdList("Access: ",access));
+        idList.add(new IdList("Mode",mode));
         idList.add(new IdList("Home: ",place.substring(0,1).toUpperCase() + place.substring(1).toLowerCase()));
         idList.add(new IdList("Destination: ",destination));
 
