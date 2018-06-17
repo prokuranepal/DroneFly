@@ -66,8 +66,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String place;
     String destination = "";
     String mode = "Real";
-//    private final String urlString = "http://192.168.1.119:3000";
-    private final String urlString = "https://nicwebpage.herokuapp.com/";
+    private final String urlString = "http://192.168.1.119:3000";
+//    private final String urlString = "https://nicwebpage.herokuapp.com/";
 
     AdapterView statusListView;
     ArrayList<StatusData> statusList;
@@ -112,6 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button clearMission;
     Button sendMission;
     Button simulate;
+    Button reset;
     Spinner circleSpinner;
     Spinner destinationSpinner;
     Integer circleRadius;
@@ -219,7 +220,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 destination = adapterView.getItemAtPosition(i).toString();
-                idList.get(5).setValue(destination);
+                idList.get(6).setValue(destination);
                 idListAdapter.notifyDataSetChanged();
                 builder.setTitle("FLight from " + place + " to " + destination + ".");
                 Toast.makeText(getApplicationContext(), place + " to " + destination, Toast.LENGTH_SHORT).show();
@@ -229,7 +230,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
                 destination = "Ramche";
-                Toast.makeText(getApplicationContext(), place + " to " + destination, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), place + " to " + destination, Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -366,6 +367,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        reset = findViewById(R.id.reset);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                try {
+//                    dronePath.remove();
+//                }catch(NullPointerException npe) {
+//                    Log.i("INFO","Drone path not defined");
+//                }
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
+                clearMission();
+                clearPath();
+                makeDronePath = false;
+                makeDronePathS = false;
+                loadCurrentPosition = false;
+                firstMissionLoad = true;
+
+            }
+        });
+
         sendMission = findViewById(R.id.sendMission);
         sendMission.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -403,6 +424,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } else {
                     SendCommand sendCommand = new SendCommand();
                     sendCommand.execute("cancelSimulate","");
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
                     makeDronePathS = false;
                     simulate.setText("Simulate");
                     cancelSimulation = false;
@@ -865,6 +887,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }catch(NullPointerException npe) {
             Log.i("INFO","Mission marker not defined");
+        }
+    }
+
+    public void clearPath() {
+        try {
+            for(int i=0; i < dronePath.size();i++) {
+                dronePath.get(i).remove();
+            }
+        } catch(NullPointerException npe) {
+            Log.i("INFO","Dronepath not defined");
         }
     }
 }
