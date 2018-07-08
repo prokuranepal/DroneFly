@@ -54,8 +54,9 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     boolean connection_flag = false;
     SharedPreferences shared;
     RequestQueue queue;
-    String url = "http://192.168.1.119:3000/android/";
+//    String url = "http://192.168.1.119:3000/android/";
 //    private final String url = "https://nicwebpage.herokuapp.com/android/";
+    private final String url = "http://drone.nicnepal.org:8081/android/";
     Spinner username;
     String user_name;
     String[] items = new String[]{"ADMIN", "NICPULCHOWK", "NICNANGI","NICRAMCHE","NICKHOKANA","NICDHARAN","NICBENI"};
