@@ -68,7 +68,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String mode = "Real";
 //    private final String urlString = "http://192.168.1.119:3000";
 //    private final String urlString = "https://nicwebpage.herokuapp.com/";
-private final String urlString = "http://drone.nicnepal.org:8081";
+    private final String urlString = "http://drone.nicnepal.org:8081";
 
     AdapterView statusListView;
     ArrayList<StatusData> statusList;
@@ -155,7 +155,7 @@ private final String urlString = "http://drone.nicnepal.org:8081";
 
 
         //initialize socket by sending joinAndroid event
-        initSocket();
+//        initSocket();
 
         //markers, mission path and drone path arraylist
         missionMarker = new ArrayList<>();
@@ -552,6 +552,8 @@ private final String urlString = "http://drone.nicnepal.org:8081";
         //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(nic, 17.0f));
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
+        Log.i("INFO","Hello");
+        initSocket();
     }
 
     public void initSocket() {
@@ -643,7 +645,7 @@ private final String urlString = "http://drone.nicnepal.org:8081";
 
                                     //load the map and current position on first receive of `
                                     if (loadCurrentPosition == false) {
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
+                                        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
                                         loadCurrentPosition = true;
                                         prevLatLng = currentLatLng;
                                         home = currentLatLng;
