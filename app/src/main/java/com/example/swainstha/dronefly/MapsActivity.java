@@ -87,7 +87,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean makeDronePathS = false;
     boolean loadCurrentPosition = false; //to load the map and position on first receive of status
     boolean firstMissionLoad = true; //to load mission at first to initialize the preLatLngMission
-    boolean flyFlag = false; //to fly only when all the checkboxes are checked by the user
+    boolean flyFlag = true; //to fly only when all the checkboxes are checked by the user
     boolean simulateMission = false; //for simulation or mission
     boolean cancelSimulation = false; //for cancelling simulation and show simulate or cancel
 
@@ -652,12 +652,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     }
 
                                     //change color of markers based on arm
-                                    if (data.getString("arm").toString() == "true" && markerChanged) {
+                                    if (data.getString("arm").toString() == "True" && !markerChanged) {
                                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
-                                        markerChanged = false;
-                                    } else if (data.getString("arm").toString() == "false" && !markerChanged) {
-                                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
                                         markerChanged = true;
+                                    } else if (data.getString("arm").toString() == "False" && markerChanged) {
+                                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
+                                        markerChanged = false;
                                     }
 
                                     //set the rotation based on heading

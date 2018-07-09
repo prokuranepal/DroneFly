@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.example.swainstha.dronefly.MapsActivity" />
+
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="25dp"
+        android:id="@+id/download_mission"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="Download"
+        android:textSize="12sp"
+        android:padding="2dp"/>
+
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="25dp"
+        android:id="@+id/clear_mission"
+        android:layout_toRightOf="@+id/download_mission"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="Clear"
+        android:textSize="12sp"
+        android:padding="2dp"/>
+
+    <Spinner
+        android:id="@+id/destination"
+        android:layout_width="70dp"
+        android:layout_height="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/clear_mission"
+        android:layout_toRightOf="@+id/clear_mission"
+        android:background="@color/white"
+        android:layout_alignBaseline="@+id/clear_mission"
+        android:textSize="12sp"
+        />
+
+    <Button
+        android:id="@+id/sendMission"
+        android:layout_width="50dp"
+        android:layout_height="25dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/destination"
+        android:text="Send"
+        android:textSize="12sp"
+        android:padding="2dp"/>
+
+    <Button
+        android:id="@+id/simulate"
+        android:layout_width="80dp"
+        android:layout_height="25dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/sendMission"
+        android:text="Simulate"
+        android:textSize="12sp"
+        android:padding="2dp"/>
+
+    <Button
+        android:id="@+id/reset"
+        android:layout_width="60dp"
+        android:layout_height="25dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/simulate"
+        android:text="Reset"
+        android:textSize="12sp"
+        android:padding="2dp"/>
+
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="25dp"
+        android:id="@+id/show"
+        android:layout_below="@+id/download_mission"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="SHOW"
+        android:textSize="12sp"
+        android:padding="2dp"/>
+
+    <Button
+        android:layout_width="70dp"
+        android:layout_height="25dp"
+        android:id="@+id/circle"
+        android:layout_below="@+id/download_mission"
+        android:layout_toRightOf="@+id/show"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="CIRCLE"
+        android:textSize="12sp"
+        android:padding="2dp"/>
+
+    <Spinner
+        android:id="@+id/circle_radius"
+        android:layout_width="50dp"
+        android:layout_height="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/clear_mission"
+        android:layout_toRightOf="@+id/circle"
+        android:background="@color/white"
+        android:layout_alignBaseline="@+id/circle"
+        android:textSize="12sp"/>
+
+    <!--<EditText-->
+        <!--android:id="@+id/circle_radius"-->
+        <!--android:layout_width="80dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_marginLeft="20dp"-->
+        <!--android:layout_marginTop="20dp"-->
+        <!--android:layout_toRightOf="@+id/circle"-->
+        <!--android:background="@color/white"-->
+        <!--android:layout_alignBaseline="@+id/circle"-->
+        <!--android:focusableInTouchMode="true" />-->
+
+    <include android:id="@+id/cell1"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@id/show"
+        android:layout_height="wrap_content"
+        android:layout_width="130dp"
+        layout="@layout/status_list_view" />
+
+    <include android:id="@+id/cell3"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_height="wrap_content"
+        android:layout_width="130dp"
+        layout="@layout/id_list_view" />
+
+    <include android:id="@+id/cell2"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/cell3"
+        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        layout="@layout/check_list_view" />
+
+    <Button
+        android:id="@+id/fly"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
+        android:layout_toLeftOf="@+id/cell3"
+        android:background="@drawable/fly_red"
+        android:text="FLY"
+        android:textSize="20sp" />
+
+
+</android.widget.RelativeLayout>
