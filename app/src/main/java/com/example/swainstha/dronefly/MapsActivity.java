@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -18,10 +20,13 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -87,7 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean makeDronePathS = false;
     boolean loadCurrentPosition = false; //to load the map and position on first receive of status
     boolean firstMissionLoad = true; //to load mission at first to initialize the preLatLngMission
-    boolean flyFlag = true; //to fly only when all the checkboxes are checked by the user
+    boolean flyFlag = false; //to fly only when all the checkboxes are checked by the user
     boolean simulateMission = false; //for simulation or mission
     boolean cancelSimulation = false; //for cancelling simulation and show simulate or cancel
 
@@ -126,15 +131,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     AlertDialog.Builder builder; //dialog builder to ask for confirmation after fly button is pressed
 
+
+    //For floating buttons
+    FloatingActionButton fab;
+    FloatingActionButton fab1;
+    FloatingActionButton fab2;
+    FloatingActionButton fab3;
+
+    private boolean FAB_Status = false;
+
+    //Animations
+    Animation show_fab_1;
+    Animation hide_fab_1;
+    Animation show_fab_2;
+    Animation hide_fab_2;
+    Animation show_fab_3;
+    Animation hide_fab_3;
+
+    private int flyMode = 0;
     @Override
     public void onPictureClick(boolean c){
 
         if(c) {
             fly.setBackgroundResource(R.drawable.fly_green);
+            fab.getBackground().setTint(getResources().getColor(R.color.green));
+            fab1.getBackground().setTint(getResources().getColor(R.color.green));
+            fab2.getBackground().setTint(getResources().getColor(R.color.green));
+            fab3.getBackground().setTint(getResources().getColor(R.color.green));
             flyFlag = true;
         }
         else {
             fly.setBackgroundResource((R.drawable.fly_red));
+            fab.getBackground().setTint(getResources().getColor(R.color.red));
+            fab1.getBackground().setTint(getResources().getColor(R.color.red));
+            fab2.getBackground().setTint(getResources().getColor(R.color.red));
+            fab3.getBackground().setTint(getResources().getColor(R.color.red));
             flyFlag = false;
         }
     }
@@ -380,10 +411,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
                 clearMission();
                 clearPath();
-                makeDronePath = false;
-                makeDronePathS = false;
+//                makeDronePath = false;
+//                makeDronePathS = false;
                 loadCurrentPosition = false;
                 firstMissionLoad = true;
+                markerChanged = false;
 
             }
         });
@@ -449,7 +481,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(DialogInterface dialog, int which) {
                 SendCommand sendCommand = new SendCommand();
                 try {
-                    String res = sendCommand.execute("fly","1").get();
+                    String res = "";
+                    switch (flyMode) {
+                        case 1:
+                            res = sendCommand.execute("fly", "1").get();
+                            break;
+                        case 2:
+                            res = sendCommand.execute("LAND", "1").get();
+                            break;
+                        case 3:
+                            res = sendCommand.execute("RTL", "1").get();
+                            break;
+                    }
+                    flyMode = 0;
                     makeDronePath = true;
                     Log.i("INFO", res);
                 } catch (ExecutionException e) {
@@ -467,6 +511,88 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 // Do nothing
                 dialog.dismiss();
+            }
+        });
+
+
+        //Floating Action Buttons
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab1 = (FloatingActionButton) findViewById(R.id.fab_1);
+        fab2 = (FloatingActionButton) findViewById(R.id.fab_2);
+        fab3 = (FloatingActionButton) findViewById(R.id.fab_3);
+
+        //Animations
+        show_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab1_show);
+        hide_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab1_hide);
+        show_fab_2 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab2_show);
+        hide_fab_2 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab2_hide);
+        show_fab_3 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab3_show);
+        hide_fab_3 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab3_hide);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (FAB_Status == false) {
+                    //Display FAB menu
+                    expandFAB();
+                    FAB_Status = true;
+                } else {
+                    //Close FAB menu
+                    hideFAB();
+                    FAB_Status = false;
+                }
+            }
+        });
+
+        fab1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(flyFlag) {
+                    flyMode = 1;
+                    builder.setTitle("Make the Flight");
+                    builder.setMessage("Are you sure?");
+                    AlertDialog alert = builder.create();
+                    alert.show();
+
+                } else {
+                    Toast.makeText(MapsActivity.this, "Make sure all checks are completed", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
+
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(flyFlag) {
+                    flyMode = 2;
+                    builder.setTitle("Land to current position");
+                    builder.setMessage("Are you sure?");
+                    AlertDialog alert = builder.create();
+                    alert.show();
+
+                } else {
+                    Toast.makeText(MapsActivity.this, "Make sure all checks are completed", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
+
+        fab3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(flyFlag) {
+                    flyMode = 3;
+                    builder.setTitle("Return to Home");
+                    builder.setMessage("Are you sure?");
+                    AlertDialog alert = builder.create();
+                    alert.show();
+
+                } else {
+                    Toast.makeText(MapsActivity.this, "Make sure all checks are completed", Toast.LENGTH_SHORT).show();
+
+                }
             }
         });
 
@@ -524,8 +650,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         idListView.setAdapter(idListAdapter);
 
     }
-
-
 
     /**
      * Manipulates the map once available.
@@ -616,7 +740,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (!simulateMission) {
 
                         final String res = args[0].toString();
-                        Log.i("INFO", res);
+                        //Log.i("INFO", res);
 
                         try {
                             data = new JSONObject(res);
@@ -645,19 +769,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                     //load the map and current position on first receive of `
                                     if (loadCurrentPosition == false) {
-                                        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
                                         loadCurrentPosition = true;
                                         prevLatLng = currentLatLng;
                                         home = currentLatLng;
                                     }
-
+                                    Log.i("ARM",data.getString("arm") + markerChanged);
                                     //change color of markers based on arm
-                                    if (data.getString("arm").toString() == "True" && !markerChanged) {
+                                    if (data.getString("arm").toString() == "true" && !markerChanged) {
                                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
                                         markerChanged = true;
-                                    } else if (data.getString("arm").toString() == "False" && markerChanged) {
+                                        Log.i("INFO","ARMED");
+                                    } else if (data.getString("arm").toString() == "FALSE" && markerChanged) {
                                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
                                         markerChanged = false;
+                                        Log.i("INFO","DISARMED");
                                     }
 
                                     //set the rotation based on heading
@@ -780,12 +906,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     }
 
                                     //change color of markers based on arm
-                                    if (data.getString("arm").toString() == "true" && markerChanged) {
+                                    if (data.getString("arm").toString() == "true" && !markerChanged) {
                                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
-                                        markerChanged = false;
-                                    } else if (data.getString("arm").toString() == "false" && !markerChanged) {
-                                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
                                         markerChanged = true;
+                                        Log.i("INFO","ARMED");
+                                    } else if (data.getString("arm").toString() == "false" && markerChanged) {
+                                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
+                                        markerChanged = false;
+                                        Log.i("INFO","DISARMED");
                                     }
 
                                     //set the rotation based on heading
@@ -901,5 +1029,61 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch(NullPointerException npe) {
             Log.i("INFO","Dronepath not defined");
         }
+    }
+
+
+    private void expandFAB() {
+
+        //Floating Action Button 1
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
+        layoutParams.rightMargin += (int) (fab1.getWidth() * 1.7);
+        layoutParams.bottomMargin += (int) (fab1.getHeight() * 0.25);
+        fab1.setLayoutParams(layoutParams);
+        fab1.startAnimation(show_fab_1);
+        fab1.setClickable(true);
+
+        //Floating Action Button 2
+        FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
+        layoutParams2.rightMargin += (int) (fab2.getWidth() * 1.5);
+        layoutParams2.bottomMargin += (int) (fab2.getHeight() * 1.5);
+        fab2.setLayoutParams(layoutParams2);
+        fab2.startAnimation(show_fab_2);
+        fab2.setClickable(true);
+
+        //Floating Action Button 3
+        FrameLayout.LayoutParams layoutParams3 = (FrameLayout.LayoutParams) fab3.getLayoutParams();
+        layoutParams3.rightMargin += (int) (fab3.getWidth() * 0.25);
+        layoutParams3.bottomMargin += (int) (fab3.getHeight() * 1.7);
+        fab3.setLayoutParams(layoutParams3);
+        fab3.startAnimation(show_fab_3);
+        fab3.setClickable(true);
+    }
+
+
+    private void hideFAB() {
+
+        //Floating Action Button 1
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
+        layoutParams.rightMargin -= (int) (fab1.getWidth() * 1.7);
+        layoutParams.bottomMargin -= (int) (fab1.getHeight() * 0.25);
+        fab1.setLayoutParams(layoutParams);
+        fab1.startAnimation(hide_fab_1);
+        fab1.setClickable(false);
+
+        //Floating Action Button 2
+        FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
+        layoutParams2.rightMargin -= (int) (fab2.getWidth() * 1.5);
+        layoutParams2.bottomMargin -= (int) (fab2.getHeight() * 1.5);
+        fab2.setLayoutParams(layoutParams2);
+        fab2.startAnimation(hide_fab_2);
+        fab2.setClickable(false);
+
+        //Floating Action Button 3
+        FrameLayout.LayoutParams layoutParams3 = (FrameLayout.LayoutParams) fab3.getLayoutParams();
+        layoutParams3.rightMargin -= (int) (fab3.getWidth() * 0.25);
+        layoutParams3.bottomMargin -= (int) (fab3.getHeight() * 1.7);
+        fab3.setLayoutParams(layoutParams3);
+        fab3.startAnimation(hide_fab_3);
+        fab3.setClickable(false);
     }
 }

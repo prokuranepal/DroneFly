@@ -1,6 +1,7 @@
-
 <android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/imageView"
@@ -57,5 +58,8 @@
             android:text="Sign In"
             android:textColor="@color/common_google_signin_btn_text_dark_default"
             android:textColorLink="@color/common_google_signin_btn_text_dark_default" />
+
+
+
     </RelativeLayout>
 </android.widget.RelativeLayout>
