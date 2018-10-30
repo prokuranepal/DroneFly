@@ -84,6 +84,17 @@
         android:padding="2dp"/>
 
     <Button
+        android:id="@+id/servo"
+        android:layout_width="60dp"
+        android:layout_height="25dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/reset"
+        android:text="Servo"
+        android:textSize="12sp"
+        android:padding="2dp"/>
+
+    <Button
         android:layout_width="60dp"
         android:layout_height="25dp"
         android:id="@+id/show"

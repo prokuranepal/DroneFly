@@ -71,9 +71,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String place;
     String destination = "";
     String mode = "Real";
-//    private final String urlString = "http://192.168.1.119:3000";
-//    private final String urlString = "https://nicwebpage.herokuapp.com/";
-    private final String urlString = "http://drone.nicnepal.org:8081";
+    private final String urlString = "http://192.168.1.67:3000/";
+//   private final String urlString = "https://nicwebpage.herokuapp.com/";
+   // private final String urlString = "http://drone.nicnepal.org:8081";
 
     AdapterView statusListView;
     ArrayList<StatusData> statusList;
@@ -95,6 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean flyFlag = false; //to fly only when all the checkboxes are checked by the user
     boolean simulateMission = false; //for simulation or mission
     boolean cancelSimulation = false; //for cancelling simulation and show simulate or cancel
+    boolean servo_on = false;
 
     JSONObject data;
     JSONObject mission;
@@ -119,6 +120,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button sendMission;
     Button simulate;
     Button reset;
+    Button servo;
     Spinner circleSpinner;
     Spinner destinationSpinner;
     Integer circleRadius;
@@ -434,7 +436,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     je.printStackTrace();
                 }
                 sendCommand.execute("positions",jsonObject.toString());
-                Log.i("Send", place + " " + destination);
+                Log.i("Send", place + "-" + destination);
             }
         });
 
@@ -467,6 +469,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     idListAdapter.notifyDataSetChanged();
                 }
 
+            }
+        });
+
+        servo = findViewById(R.id.servo);
+        servo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SendCommand sendCommand = new SendCommand();
+                if(servo_on) {
+                    sendCommand.execute("servo", "off");
+                    servo_on = false;
+                } else {
+                    sendCommand.execute("servo", "on");
+                    servo_on = true;
+                }
             }
         });
 
@@ -698,7 +715,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(getApplicationContext(), urlString + place, Toast.LENGTH_SHORT).show();
             //socket = manager.socket(place); //specifying the url
 //            if (place.equals("admin")) {
-                socket = IO.socket(urlString);
+                String url = urlString + place;
+                Log.i("DATA", url);
+                socket = IO.socket(urlString  + place);
 //            } else {
 //                socket = IO.socket(urlString + place);
 //            }
@@ -714,7 +733,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
                 //execute worker thread to send data
-                sendCommand.execute("joinAndroid", "1").get();
+                Log.i("DATA", sendCommand.execute("joinAndroid", "1").get());
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -774,16 +793,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         prevLatLng = currentLatLng;
                                         home = currentLatLng;
                                     }
-                                    Log.i("ARM",data.getString("arm") + markerChanged);
+                                    Log.i("ARM",data.getString("arm").toLowerCase() + markerChanged);
                                     //change color of markers based on arm
-                                    if (data.getString("arm").toString() == "true" && !markerChanged) {
+                                    if (data.getString("arm").toLowerCase() == "true" && !markerChanged) {
                                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
                                         markerChanged = true;
-                                        Log.i("INFO","ARMED");
-                                    } else if (data.getString("arm").toString() == "FALSE" && markerChanged) {
+                                        Log.i("ARM","ARMED");
+                                    } else if (data.getString("arm").toLowerCase() == "false" & markerChanged) {
                                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
                                         markerChanged = false;
-                                        Log.i("INFO","DISARMED");
+                                        Log.i("ARM","DISARMED");
                                     }
 
                                     //set the rotation based on heading

@@ -62,9 +62,9 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     boolean connection_flag = false;
     SharedPreferences shared;
     RequestQueue queue;
-//    String url = "http://192.168.1.119:3000/android/";
-//    private final String url = "https://nicwebpage.herokuapp.com/android/";
-    private final String url = "http://drone.nicnepal.org:8081/android/";
+    String url = "http://192.168.1.67:3000/android/";
+//   private final String url = "https://nicwebpage.herokuapp.com/android/";
+   // private final String url = "http://drone.nicnepal.org:8081/android/";
     Spinner username;
     String user_name;
 
@@ -114,7 +114,6 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         access_type = access_type.substring(0,1).toUpperCase() + access_type.substring(1).toLowerCase();
         i.putExtra("access",access_type);
         startActivity(i);
-
     }
 
 
@@ -131,9 +130,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                     public void onResponse(String response) {
 
                         try {
-
-
-                            Log.i("resonse", response.toString());
+                            Log.i("response", response.toString());
                             if (response.toString().equals("OK")) {
                                 signUpSignInOption();
                                 Toast.makeText(getApplicationContext(),"SignIn successful",Toast.LENGTH_SHORT).show();

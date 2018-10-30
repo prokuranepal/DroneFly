@@ -2,9 +2,9 @@
 <resources>
     <string-array name="destination_array">
         <item>Ramche</item>
-        <item>Pulchowk</item>
-        <item>Khokana</item>
-        <item>Beni</item>
-        <item>Myagdi</item>
+        <item>Ramcher</item>
+        <item>Ramchest</item>
+        <item>More Ramche</item>
+        <item>Most Ramche</item>
     </string-array>
 </resources>
