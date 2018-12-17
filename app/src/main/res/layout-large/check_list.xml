@@ -5,23 +5,25 @@
 
     <TextView
         android:id="@+id/check_names"
-        android:layout_width="70dp"
-        android:layout_height="25dp"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:paddingLeft="5dp"
         android:layout_alignParentStart="true"
         android:shadowColor="@color/black"
         android:shadowRadius="2"
         android:textColor="@color/white"
-        android:textSize="12sp"
+        android:textSize="16sp"
         android:text="Pre-Flight Checks"
-        android:gravity="center"/>
+        android:gravity="left"/>
 
     <CheckBox
         android:id="@+id/check_box"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+
         android:layout_toRightOf="@+id/check_names"
         android:buttonTint="@color/white"
-        android:gravity="center"
+        android:gravity="right"
         />
 
 </android.widget.RelativeLayout>

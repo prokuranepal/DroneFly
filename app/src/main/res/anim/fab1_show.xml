@@ -7,8 +7,8 @@
         android:duration="100"
         android:fromDegrees="30"
         android:interpolator="@android:anim/linear_interpolator"
-        android:pivotX="50%"
-        android:pivotY="50%"
+        android:pivotX="30%"
+        android:pivotY="30%"
         android:repeatCount="4"
         android:repeatMode="reverse"
         android:toDegrees="0"></rotate>
@@ -16,8 +16,8 @@
     <!--Move-->
     <translate
         android:duration="500"
-        android:fromXDelta="170%"
-        android:fromYDelta="25%"
+        android:fromXDelta="80%"
+        android:fromYDelta="15%"
         android:interpolator="@android:anim/linear_interpolator"
         android:toXDelta="0%"
         android:toYDelta="0%"></translate>

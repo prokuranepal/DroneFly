@@ -14,120 +14,103 @@
         tools:context="com.example.swainstha.dronefly.MapsActivity" />
 
     <Button
-        android:layout_width="100dp"
-        android:layout_height="25dp"
+        android:layout_width="170dp"
+        android:layout_height="40dp"
         android:id="@+id/download_mission"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:text="Download"
-        android:textSize="12sp"
-        android:padding="2dp"/>
+        android:text="Download Mission" />
 
     <Button
-        android:layout_width="60dp"
-        android:layout_height="25dp"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
         android:id="@+id/clear_mission"
         android:layout_toRightOf="@+id/download_mission"
         android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:text="Clear"
-        android:textSize="12sp"
-        android:padding="2dp"/>
+        android:text="Clear Mission" />
 
     <Spinner
         android:id="@+id/destination"
-        android:layout_width="70dp"
-        android:layout_height="20dp"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:layout_below="@+id/clear_mission"
         android:layout_toRightOf="@+id/clear_mission"
         android:background="@color/white"
-        android:layout_alignBaseline="@+id/clear_mission"
-        android:textSize="12sp"
-        />
+        android:layout_alignBaseline="@+id/clear_mission" />
 
     <Button
         android:id="@+id/sendMission"
-        android:layout_width="50dp"
-        android:layout_height="25dp"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@+id/destination"
-        android:text="Send"
-        android:textSize="12sp"
-        android:padding="2dp"/>
+        android:text="Send" />
 
     <Button
         android:id="@+id/simulate"
-        android:layout_width="80dp"
-        android:layout_height="25dp"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@+id/sendMission"
-        android:text="Simulate"
-        android:textSize="12sp"
-        android:padding="2dp"/>
+        android:text="Simulate" />
 
     <Button
         android:id="@+id/reset"
-        android:layout_width="60dp"
-        android:layout_height="25dp"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@+id/simulate"
-        android:text="Reset"
-        android:textSize="12sp"
-        android:padding="2dp"/>
+        android:text="Reset" />
 
     <Button
         android:id="@+id/servo"
-        android:layout_width="60dp"
-        android:layout_height="25dp"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:layout_toRightOf="@+id/reset"
+        android:layout_below="@+id/download_mission"
+        android:layout_toRightOf="@+id/circle_radius"
         android:text="Servo"
-        android:textSize="12sp"
         android:padding="2dp"/>
 
     <Button
-        android:layout_width="60dp"
-        android:layout_height="25dp"
+        android:layout_width="70dp"
+        android:layout_height="40dp"
         android:id="@+id/show"
         android:layout_below="@+id/download_mission"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:text="SHOW"
-        android:textSize="12sp"
-        android:padding="2dp"/>
+        android:text="SHOW" />
 
     <Button
-        android:layout_width="70dp"
-        android:layout_height="25dp"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
         android:id="@+id/circle"
         android:layout_below="@+id/download_mission"
         android:layout_toRightOf="@+id/show"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:text="CIRCLE"
-        android:textSize="12sp"
-        android:padding="2dp"/>
+        android:text="CIRCLE" />
 
     <Spinner
         android:id="@+id/circle_radius"
-        android:layout_width="50dp"
-        android:layout_height="20dp"
+        android:layout_width="80dp"
+        android:layout_height="30dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_below="@+id/clear_mission"
         android:layout_toRightOf="@+id/circle"
         android:background="@color/white"
-        android:layout_alignBaseline="@+id/circle"
-        android:textSize="12sp"/>
+        android:layout_alignBaseline="@+id/circle" />
 
     <!--<EditText-->
         <!--android:id="@+id/circle_radius"-->
@@ -141,27 +124,29 @@
         <!--android:focusableInTouchMode="true" />-->
 
     <include android:id="@+id/cell1"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
         android:layout_below="@id/show"
         android:layout_height="wrap_content"
-        android:layout_width="130dp"
+        android:layout_width="160dp"
         layout="@layout/status_list_view" />
 
     <include android:id="@+id/cell3"
-        android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
+        android:layout_marginTop="15dp"
         android:layout_alignParentRight="true"
-        android:layout_height="0dp"
-        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_width="185dp"
         layout="@layout/id_list_view" />
 
     <include android:id="@+id/cell2"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginRight="10dp"
         android:layout_alignParentRight="true"
+        android:layout_below="@+id/cell3"
         android:layout_height="wrap_content"
-        android:layout_width="100dp"
+        android:layout_width="120dp"
+        android:layout_alignLeft="@+id/cell3"
         layout="@layout/check_list_view" />
 
     <android.support.design.widget.FloatingActionButton
@@ -173,7 +158,7 @@
         android:layout_alignParentEnd="true"
         android:src="@drawable/fly"
         app:backgroundTint="@color/red"
-
+        app:fabSize="normal"
         app:layout_behavior="com.valdio.valdioveliu.floatingactionbuttonproject.Scrolling_Floating_Action_Button.FAB_Float_on_Scroll"
         />
 
@@ -184,7 +169,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="30dp"
         android:layout_toLeftOf="@+id/cell3"
         android:background="@drawable/fly_red"
         android:text="FLY"

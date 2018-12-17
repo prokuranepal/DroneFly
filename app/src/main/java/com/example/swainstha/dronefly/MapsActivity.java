@@ -71,8 +71,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String place;
     String destination = "";
     String mode = "Real";
-    private final String urlString = "http://192.168.1.67:3000/";
-//   private final String urlString = "https://nicwebpage.herokuapp.com/";
+//    private final String urlString = "http://192.168.1.67:3000/";
+    private final String urlString = "https://nicwebpage.herokuapp.com/";
    // private final String urlString = "http://drone.nicnepal.org:8081";
 
     AdapterView statusListView;

@@ -5,7 +5,7 @@
 
     <ListView
         android:id="@+id/checkListView"
-        android:layout_width="130dp"
+        android:layout_width="135dp"
         android:layout_height="wrap_content"></ListView>
 
 </android.widget.RelativeLayout>
