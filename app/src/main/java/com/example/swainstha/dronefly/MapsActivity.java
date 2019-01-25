@@ -811,9 +811,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         prevLatLng = currentLatLng;
                                         home = currentLatLng;
                                     }
-                                    Log.i("ARM",data.getString("arm").toLowerCase() + markerChanged);
+                                    Log.i("ARM",data.getString("arm") + "Marker " + markerChanged);
                                     //change color of markers based on arm
-                                    if (data.getString("arm").toLowerCase() == "true" && !markerChanged) {
+                                    if (data.getString("arm").toLowerCase().equals("true") && !markerChanged) {
                                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
                                         if (checkPermission(Manifest.permission.SEND_SMS) && send_message) {
                                             try {
@@ -830,7 +830,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         }
                                         markerChanged = true;
                                         Log.i("ARM","ARMED");
-                                    } else if (data.getString("arm").toLowerCase() == "false" & markerChanged) {
+                                    } else if (data.getString("arm").toLowerCase().equals("false") & markerChanged) {
                                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
                                         markerChanged = false;
                                         Log.i("ARM","DISARMED");
