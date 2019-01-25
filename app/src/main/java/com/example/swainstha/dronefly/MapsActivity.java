@@ -1,19 +1,24 @@
 package com.example.swainstha.dronefly;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -72,8 +77,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String destination = "";
     String mode = "Real";
 //    private final String urlString = "http://192.168.1.67:3000/";
-    private final String urlString = "https://nicwebpage.herokuapp.com/";
-   // private final String urlString = "http://drone.nicnepal.org:8081";
+   // private final String urlString = "https://nicwebpage.herokuapp.com/";
+   private  String urlString = null;
+    // private final String urlString = "http://drone.nicnepal.org:8081";
 
     AdapterView statusListView;
     ArrayList<StatusData> statusList;
@@ -86,7 +92,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ListView idListView;
     ArrayList<IdList> idList;
     IdListAdapter idListAdapter;
-
+    private final static int SEND_SMS_PERMISSION_REQUEST_CODE=111;
+    private static final int REQUEST_READ_PHONE_STATE =1 ;
     boolean markerChanged = false; //to change the marker color from red to green on arm and green to red on disarm
     boolean makeDronePath = false; //starting making the drone path after the fly command is sent
     boolean makeDronePathS = false;
@@ -96,6 +103,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean simulateMission = false; //for simulation or mission
     boolean cancelSimulation = false; //for cancelling simulation and show simulate or cancel
     boolean servo_on = false;
+    private boolean send_message=false;
 
     JSONObject data;
     JSONObject mission;
@@ -179,6 +187,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_map);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         place=getIntent().getStringExtra("place");
+        urlString=getIntent().getStringExtra("url_id");
+        urlString=urlString.replaceFirst("android/", "");
+        Log.i("mapsactivity url",urlString);
         String access = getIntent().getStringExtra("access");
         if(place != null) {
             place = place.replace("nic", "");
@@ -502,6 +513,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     switch (flyMode) {
                         case 1:
                             res = sendCommand.execute("fly", "1").get();
+                            send_message=true;
                             break;
                         case 2:
                             res = sendCommand.execute("LAND", "1").get();
@@ -772,6 +784,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                     int i = 0;
                                     Iterator iter = data.keys();
+                                    if(data.getString("arm").equals("true")) {
+                                        makeDronePath = true;
+                                        Log.i("INFO", "Inside arm equals to true");
+                                    } else {
+                                        makeDronePath = false;
+                                    }
                                     while (iter.hasNext()) {
                                         String key = (String) iter.next();
                                         String value = data.getString(key);
@@ -797,6 +815,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     //change color of markers based on arm
                                     if (data.getString("arm").toLowerCase() == "true" && !markerChanged) {
                                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
+                                        if (checkPermission(Manifest.permission.SEND_SMS) && send_message) {
+                                            try {
+                                                //SmsManager smsManager = SmsManager.getDefault();
+                                                //smsManager.sendTextMessage("9841122040", null, "Drone incoming", null, null);
+                                                send_message=false;
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                Toast.makeText(MapsActivity.this, "message sending failed",Toast.LENGTH_SHORT).show();
+                                            }
+                                            } else {
+                                            Toast.makeText(MapsActivity.this, "Permission denied", Toast.LENGTH_SHORT).show();
+                                        }
                                         markerChanged = true;
                                         Log.i("ARM","ARMED");
                                     } else if (data.getString("arm").toLowerCase() == "false" & markerChanged) {
@@ -1105,4 +1136,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fab3.startAnimation(hide_fab_3);
         fab3.setClickable(false);
     }
+    private boolean checkPermission(String permission) {
+        int checkPermission = ContextCompat.checkSelfPermission(this, permission);
+        return checkPermission == PackageManager.PERMISSION_GRANTED;
+    }
+
 }

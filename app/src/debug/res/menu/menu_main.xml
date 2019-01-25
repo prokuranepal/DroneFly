@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.sa.delete.MainActivity">
+    <item
+        android:id="@+id/change_ip"
+        android:orderInCategory="100"
+        android:title="Change IP"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/nic_localhost"
+        android:orderInCategory="100"
+        android:title="NIC_localhost"
+        app:showAsAction="never" />
+</menu>

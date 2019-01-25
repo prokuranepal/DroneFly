@@ -1,6 +1,7 @@
 package com.example.swainstha.dronefly;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
@@ -8,12 +9,15 @@ import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -62,13 +66,16 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     boolean connection_flag = false;
     SharedPreferences shared;
     RequestQueue queue;
-   // String url = "http://192.168.1.67:3000/android/";
-   private final String url = "https://nicwebpage.herokuapp.com/android/";
+
+    //String url = "http://192.168.1.81:3000/android/";
+ private  String url = "https://nicwebpage.herokuapp.com/android/";
    // private final String url = "http://drone.nicnepal.org:8081/android/";
     Spinner username;
     String user_name;
 
     String[] items = new String[]{"ADMIN", "NICPULCHOWK", "NICNANGI","NICRAMCHE","NICKHOKANA","NICDHARAN","NICBENI"};
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +120,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         i.putExtra("place",user_name);
         access_type = access_type.substring(0,1).toUpperCase() + access_type.substring(1).toLowerCase();
         i.putExtra("access",access_type);
+        i.putExtra("url_id",this.url);
         startActivity(i);
     }
 
@@ -124,6 +132,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     }
 
     public void postRequestVolley(RequestQueue queue) {
+        Log.i("inside request",url);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -183,6 +192,52 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.change_ip) {
+           final EditText input = new EditText(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setView(input);
+            builder.setMessage("Set the IP")
+                    .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            url = "http://"+input.getText().toString()+":3000/android";
+                            Log.i("url",url);
+                            // FIRE ZE MISSILES!
+                        }
+                    })
+                    .setNegativeButton("no", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+            return true;
+        }
+        else if (id == R.id.nic_localhost)
+        {
+            url = "http://192.168.1.81:3000/android";
+            Log.i("nic_localhost",url);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 

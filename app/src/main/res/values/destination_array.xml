@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="destination_array">
+        <item>Kirtipur</item>
         <item>Ramche</item>
-        <item>Pulchowk</item>
-        <item>Khokana</item>
-        <item>Beni</item>
-        <item>Myagdi</item>
+        <item>Nangi</item>
+        <item>Baneshwor</item>
+        <item>Koteshwor</item>
     </string-array>
 </resources>
