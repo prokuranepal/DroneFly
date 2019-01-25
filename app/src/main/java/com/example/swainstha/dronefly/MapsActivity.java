@@ -106,6 +106,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean send_message=false;
 
     JSONObject data;
+    JSONObject data_error;
     JSONObject mission;
     RelativeLayout relativeLayout;
     RelativeLayout relativeLayout2;
@@ -763,7 +764,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void call(Object... args) {
                 }
 
-            }).on("copter-data", new Emitter.Listener() {
+            }).on("error", new Emitter.Listener() {
+
+
+                @Override
+                public void call(Object... args) {
+
+                     final String error_msg = args[0].toString();
+                    try {
+                        data_error = new JSONObject(error_msg);
+                    } catch (JSONException e) {
+                        Log.i("INFO", "Json Exception");
+                    }
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            try {
+                                String s_error =data_error.getString("msg");
+                                Toast.makeText(MapsActivity.this,s_error , Toast.LENGTH_SHORT).show();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    });
+
+                }}).
+
+
+                    on("copter-data", new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
