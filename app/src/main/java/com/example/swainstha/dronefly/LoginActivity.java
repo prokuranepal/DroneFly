@@ -117,7 +117,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
     public void signUpSignInOption() {
         Intent i = new Intent(getApplicationContext(), MapsActivity.class);
-        i.putExtra("place",user_name);
+       // i.putExtra("place",user_name);
+        i.putExtra("place","JT603");
         access_type = access_type.substring(0,1).toUpperCase() + access_type.substring(1).toLowerCase();
         i.putExtra("access",access_type);
         i.putExtra("url_id",this.url);
