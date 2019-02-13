@@ -47,6 +47,7 @@ public class CheckListAdapter extends BaseAdapter {
     public CheckListAdapter(@NonNull Context context, ArrayList<CheckList> list) {
         this.context = context;
         this.checkList = list;
+        Log.i("checklistAdapter", Boolean.toString(list.get(0).isCheck()));
     }
 
     @Override
@@ -106,14 +107,14 @@ public class CheckListAdapter extends BaseAdapter {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 getCheckList((Integer)viewHolder.check.getTag()).setCheck(isChecked);
                 //checkList.add(position,getCheckList(position));
+                boolean data = checkList.get(0).isCheck();
+                Log.i("CHECKLIST", Boolean.toString(data) );
                 check = true;
                 for(CheckList c: checkList) {
                     if(!c.isCheck()) {
                         check = false;
                     }
-
                 }
-
                 Log.i("INFO",check + "");
 
                 if(check == true)

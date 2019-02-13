@@ -68,7 +68,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     RequestQueue queue;
 
     //String url = "http://192.168.1.81:3000/android/";
- private  String url = "https://nicwebpage.herokuapp.com/android/";
+    private  String url = "https://nicwebpage.herokuapp.com/android/";
    // private final String url = "http://drone.nicnepal.org:8081/android/";
     Spinner username;
     String user_name;

@@ -652,13 +652,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         statusListView.setAdapter(statusListAdapter);
 
+        checkList.add(new CheckList("Horizon",false));
         checkList.add(new CheckList("GPS Lock",false));
         checkList.add(new CheckList("Battery",false));
-        checkList.add(new CheckList("Horizon",false));
         checkList.add(new CheckList("Mag",false));
         checkList.add(new CheckList("Flight Plan", false));
+//        checkList.get(4).setCheck(true);
+//        checkList.get(3).setCheck(true);
+//
+
+        Log.i("CHeck",Boolean.toString(checkList.get(0).isCheck()));
+//        checkList.get(0).setCheck(true);
 
         checkListAdapter = new CheckListAdapter(this, checkList);
+
+//        checkListAdapter.notifyDataSetChanged();
         LayoutInflater inflater1 = getLayoutInflater();
         ViewGroup header = (ViewGroup) inflater1.inflate(R.layout.check_list_header,
                 checkListView, false);
@@ -788,10 +796,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     });
 
-                }}).
-
-
-                    on("copter-data", new Emitter.Listener() {
+                }}).on("copter-data", new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
@@ -803,6 +808,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         try {
                             data = new JSONObject(res);
+//                            Log.i("INFO", data.toString());
                         } catch (JSONException e) {
                             Log.i("INFO", "Json Exception");
                         }
@@ -817,6 +823,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         Log.i("INFO", "Inside arm equals to true");
                                     } else {
                                         makeDronePath = false;
+                                        Log.i("DATA", data.getString("fix"));
+                                        Log.i("DATA", data.getString("volt"));
+                                        if(data.getInt("fix") == 3) {
+                                            checkList.get(1).setCheck(true);
+                                        }
+                                        if(Double.parseDouble(data.getString("volt")) > 12.0) {
+                                            checkList.get(2).setCheck(true);
+                                        }
                                     }
                                     while (iter.hasNext()) {
                                         String key = (String) iter.next();
