@@ -116,6 +116,17 @@
         android:text="CIRCLE"
         android:textSize="12sp"
         android:padding="2dp"/>
+    <Button
+        android:layout_width="70dp"
+        android:layout_height="25dp"
+        android:id="@+id/calibrate_compass"
+        android:layout_below="@+id/download_mission"
+        android:layout_toRightOf="@+id/show"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="MAGCAL"
+        android:textSize="12sp"
+        android:padding="2dp"/>
 
     <Spinner
         android:id="@+id/circle_radius"

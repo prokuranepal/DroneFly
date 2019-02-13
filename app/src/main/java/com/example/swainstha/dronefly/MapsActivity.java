@@ -130,6 +130,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button simulate;
     Button reset;
     Button servo;
+    Button calibrate_compass;
     Spinner circleSpinner;
     Spinner destinationSpinner;
     Integer circleRadius;
@@ -141,7 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ArrayList<Marker> missionMarker; //for markers of mission waypoints
 
     AlertDialog.Builder builder; //dialog builder to ask for confirmation after fly button is pressed
-
+    AlertDialog.Builder builder1;
 
     //For floating buttons
     FloatingActionButton fab;
@@ -498,6 +499,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
+
+
+        builder1 = new AlertDialog.Builder(this);
+
+        builder1.setTitle("Calibrate Compass");
+        builder1.setMessage("Are you sure?");
+
+        builder1.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                SendCommand sendCommand = new SendCommand();
+                try{
+                    sendCommand.execute("magcal","");
+                    Toast.makeText(MapsActivity.this, "Rotate Drone in all directions", Toast.LENGTH_SHORT).show();
+
+                } catch (Exception e) {
+                    Log.i("INFO", "Execution exception");
+                }
+            }
+        });
+
+        builder1.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Do nothing
+                dialog.dismiss();
+            }
+        });
+
+
+        calibrate_compass = findViewById(R.id.calibrate_compass);
+        calibrate_compass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog alert = builder1.create();
+                alert.show();
+
+            }
+        });
+
+
+
 
         //crating a dialog box to confirm fly
         builder = new AlertDialog.Builder(this);
