@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class CheckListAdapter extends BaseAdapter {
 
     Context context;
-    private ArrayList<CheckList> checkList;
+    private ArrayList<CheckList> list;
     private ArrayList<Boolean> boolCheck;
     private CheckBox checkBox;
     private boolean check = true;
@@ -40,24 +40,24 @@ public class CheckListAdapter extends BaseAdapter {
 
     // View lookup cache
     private static class ViewHolder {
-        TextView name;
-        CheckBox check;
+        TextView text;
+        CheckBox checkbox;
     }
 
     public CheckListAdapter(@NonNull Context context, ArrayList<CheckList> list) {
         this.context = context;
-        this.checkList = list;
-        Log.i("checklistAdapter", Boolean.toString(list.get(0).isCheck()));
+        this.list = list;
+//        Log.i("checklistAdapter", Boolean.toString(list.get(0).isCheck()));
     }
 
     @Override
     public int getCount() {
-        return checkList.size();
+        return list.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return checkList.get(position);
+        return list.get(position);
     }
 
     @Override
@@ -69,73 +69,118 @@ public class CheckListAdapter extends BaseAdapter {
         return ((CheckList) getItem(position));
     }
 
-    @NonNull
     @Override
-    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-        // to add a custom view..
+        ViewHolder viewHolder = null;
+        if (convertView == null) {
+            LayoutInflater inflator = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflator.inflate(R.layout.check_list, null);
+            convertView.setBackground(context.getDrawable(R.drawable.list_border));
+            viewHolder = new ViewHolder();
+            viewHolder.text = (TextView) convertView.findViewById(R.id.check_names);
+            viewHolder.checkbox = (CheckBox) convertView.findViewById(R.id.check_box);
+            viewHolder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-        final CheckListAdapter.ViewHolder viewHolder;
-        final CheckList checkList1= getCheckList(position);
-        final View result;
-
-        if(convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);;
-            convertView = layoutInflater.inflate(R.layout.check_list, parent, false);
-
-            viewHolder = new CheckListAdapter.ViewHolder();
-
-            viewHolder.name = convertView.findViewById(R.id.check_names);
-            viewHolder.check = convertView.findViewById(R.id.check_box);
-
-            convertView.setTag(viewHolder);
-
-        } else {
-            viewHolder = (CheckListAdapter.ViewHolder) convertView.getTag();
-            result=convertView;
-        }
-
-        // Set the border of View (ListView Item)
-        convertView.setBackground(context.getDrawable(R.drawable.list_border));
-        viewHolder.name.setText(checkList1.getName());
-        viewHolder.check.setChecked(checkList1.isCheck());
-        viewHolder.check.setTag(position);
-
-        viewHolder.check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                getCheckList((Integer)viewHolder.check.getTag()).setCheck(isChecked);
-                //checkList.add(position,getCheckList(position));
-                boolean data = checkList.get(0).isCheck();
-                Log.i("CHECKLIST", Boolean.toString(data) );
-                check = true;
-                for(CheckList c: checkList) {
-                    if(!c.isCheck()) {
-                        check = false;
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    int getPosition = (Integer) buttonView.getTag();  // Here we get the position that we have set for the checkbox using setTag.
+                    list.get(getPosition).setCheck(buttonView.isChecked()); // Set the value of checkbox to maintain its state.
+                    check = true;
+                    for(CheckList c: list) {
+                        if(!c.isCheck()) {
+                            check = false;
+                        }
                     }
+                    Log.i("INFO",check + "");
+
+                    if(check == true)
+                        listener.onPictureClick(true);
+                    else
+                        listener.onPictureClick(false);
                 }
-                Log.i("INFO",check + "");
 
-                if(check == true)
-                    listener.onPictureClick(true);
-                else
-                    listener.onPictureClick(false);
+            });
+            convertView.setTag(viewHolder);
+            convertView.setTag(R.id.check_names, viewHolder.text);
+            convertView.setTag(R.id.check_box, viewHolder.checkbox);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+        viewHolder.checkbox.setTag(position); // This line is important.
 
+        viewHolder.text.setText(list.get(position).getName());
+        viewHolder.checkbox.setChecked(list.get(position).isCheck());
 
-            }
-        });
-        // making view clickable
-        convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                CheckListAdapter.ViewHolder v = (CheckListAdapter.ViewHolder)view.getTag();
-
-
-            }
-        });
         return convertView;
     }
 
+//    @NonNull
+//    @Override
+//    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+//
+//        // to add a custom view..
+//
+//        final CheckListAdapter.ViewHolder viewHolder;
+//        final CheckList checkList1= getCheckList(position);
+//        final View result;
+//
+//        if(convertView == null) {
+//            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);;
+//            convertView = layoutInflater.inflate(R.layout.check_list, parent, false);
+//
+//            viewHolder = new CheckListAdapter.ViewHolder();
+//
+//            viewHolder.text = convertView.findViewById(R.id.check_names);
+//            viewHolder.checkbox = convertView.findViewById(R.id.check_box);
+//
+//            convertView.setTag(viewHolder);
+//
+//        } else {
+//            viewHolder = (CheckListAdapter.ViewHolder) convertView.getTag();
+//            result=convertView;
+//        }
+//
+//        // Set the border of View (ListView Item)
+//        convertView.setBackground(context.getDrawable(R.drawable.list_border));
+//        viewHolder.text.setText(checkList1.getName());
+//        viewHolder.checkbox.setChecked(checkList1.isCheck());
+//        viewHolder.checkbox.setTag(position);
+//
+//        viewHolder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                getCheckList((Integer)viewHolder.checkbox.getTag()).setCheck(isChecked);
+////                checkList.add(position,getCheckList(position));
+//                check = true;
+//                for(CheckList c: list) {
+//                    if(!c.isCheck()) {
+//                        check = false;
+//                    }
+//                }
+//                Log.i("INFO",check + "");
+//
+//                if(check == true)
+//                    listener.onPictureClick(true);
+//                else
+//                    listener.onPictureClick(false);
+//
+//
+//            }
+//        });
+//        // making view clickable
+//        convertView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                CheckListAdapter.ViewHolder v = (CheckListAdapter.ViewHolder)view.getTag();
+//
+//
+//            }
+//        });
+//        return convertView;
+//    }
+
 }
+

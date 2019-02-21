@@ -67,8 +67,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     SharedPreferences shared;
     RequestQueue queue;
 
-    //String url = "http://192.168.1.81:3000/android/";
-    private  String url = "https://nicwebpage.herokuapp.com/android/";
+    String url = "http://192.168.1.81:3000/android/";
+//    private  String url = "https://nicwebpage.herokuapp.com/android/";
    // private final String url = "http://drone.nicnepal.org:8081/android/";
     Spinner username;
     String user_name;
@@ -168,7 +168,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                 User.put("username", user_name);
                 //Toast.makeText(getApplicationContext(),user_name,Toast.LENGTH_SHORT).show();
                 Log.i("user_name",user_name);
-                User.put("password", password.getText().toString());
+//                User.put("password", password.getText().toString());
+                User.put("password", "nicdrone");
                 return User;
             }
         };
