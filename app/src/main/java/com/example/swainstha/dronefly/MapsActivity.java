@@ -68,7 +68,10 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,CheckListAdapter.PictureClickListener {
+import static java.lang.Math.abs;
+
+//CheckListAdapter.PictureClickListener
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, CheckListAdapter.PictureClickListener {
 
     private GoogleMap mMap;
     Marker marker;
@@ -76,9 +79,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String place;
     String destination = "";
     String mode = "Real";
-//    private final String urlString = "http://192.168.1.67:3000/";
-   // private final String urlString = "https://nicwebpage.herokuapp.com/";
-   private  String urlString = null;
+    //    private final String urlString = "http://192.168.1.67:3000/";
+    // private final String urlString = "https://nicwebpage.herokuapp.com/";
+    private  String urlString = null;
     // private final String urlString = "http://drone.nicnepal.org:8081";
 
     AdapterView statusListView;
@@ -690,6 +693,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         statusList.add(new StatusData("Volt: ","0"));
         statusList.add(new StatusData("Est","0"));
         statusList.add(new StatusData("Conn: ","0"));
+        statusList.add(new StatusData("Roll: ","0"));
+        statusList.add(new StatusData("Pitch","0"));
+        statusList.add(new StatusData("Yaw: ","0"));
 
         statusListAdapter = new StatusListAdapter(this,statusList);
         LayoutInflater inflater = getLayoutInflater();
@@ -773,9 +779,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(getApplicationContext(), urlString + place, Toast.LENGTH_SHORT).show();
             //socket = manager.socket(place); //specifying the url
 //            if (place.equals("admin")) {
-                String url = urlString + place;
-                Log.i("DATA", url);
-                socket = IO.socket(urlString  + place);
+            String url = urlString + place;
+            Log.i("DATA", url);
+            socket = IO.socket(urlString  + place);
 //            } else {
 //                socket = IO.socket(urlString + place);
 //            }
@@ -815,7 +821,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void call(Object... args) {
 
-                     final String error_msg = args[0].toString();
+                    final String error_msg = args[0].toString();
                     try {
                         data_error = new JSONObject(error_msg);
                     } catch (JSONException e) {
@@ -823,12 +829,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            try {
-                                String s_error =data_error.getString("msg");
-                                Toast.makeText(MapsActivity.this,s_error , Toast.LENGTH_SHORT).show();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+//                            try {
+////                                String s_error =data_error.getString("msg");
+////                                Toast.makeText(MapsActivity.this,s_error , Toast.LENGTH_SHORT).show();
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
 
                         }
                     });
@@ -838,104 +844,120 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     on("copter-data", new Emitter.Listener() {
 
-                @Override
-                public void call(Object... args) {
+                        @Override
+                        public void call(Object... args) {
 
-                    if (!simulateMission) {
+                            if (!simulateMission) {
 
-                        final String res = args[0].toString();
-                        //Log.i("INFO", res);
+                                final String res = args[0].toString();
+                                //Log.i("INFO", res);
 
-                        try {
-                            data = new JSONObject(res);
-                        } catch (JSONException e) {
-                            Log.i("INFO", "Json Exception");
-                        }
-                        runOnUiThread(new Runnable() {
-                            public void run() {
                                 try {
+                                    data = new JSONObject(res);
+                                } catch (JSONException e) {
+                                    Log.i("INFO", "Json Exception");
+                                }
+                                runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        try {
 
-                                    int i = 0;
-                                    Iterator iter = data.keys();
-                                    if(data.getString("arm").equals("true")) {
-                                        makeDronePath = true;
-                                        Log.i("INFO", "Inside arm equals to true");
-                                    } else {
-                                        makeDronePath = false;
-                                    }
-                                    while (iter.hasNext()) {
-                                        String key = (String) iter.next();
-                                        String value = data.getString(key);
-                                        statusList.get(i).setValue(value);
-                                        i++;
-                                    }
+                                            int i = 0;
+                                            Iterator iter = data.keys();
+                                            if(data.getString("arm").equals("true")) {
+                                                makeDronePath = true;
+                                                Log.i("INFO", "Inside arm equals to true");
+                                            } else {
+                                                makeDronePath = false;
+
+                                                if(data.getInt("fix") == 3) {
+                                                    checkList.get(0).setCheck(true);
+                                                }
+                                                if(data.getString("ekf").equals("true")) {
+                                                    checkList.get(3).setCheck(true);
+                                                }
+                                                if(abs(Double.parseDouble(data.getString("pitch"))) < 1 && abs(Double.parseDouble(data.getString("roll"))) < 1) {
+                                                    checkList.get(2).setCheck(true);
+                                                }
+                                                if(abs(Double.parseDouble(data.getString("volt"))) > 12.4) {
+                                                    checkList.get(1).setCheck(true);
+                                                }
+                                                checkListAdapter.notifyDataSetChanged();
+                                            }
+                                            while (iter.hasNext()) {
+                                                String key = (String) iter.next();
+                                                String value = data.getString(key);
+                                                statusList.get(i).setValue(value);
+                                                i++;
+                                            }
+
+
 //                                for (int i = 0; i < statusList.size(); i++) {
 //                                    statusList.get(i).setValue(data.names().get(i).toString());
 //                                }
-                                    statusListAdapter.notifyDataSetChanged();
-                                    LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat").toString()),
-                                            Double.parseDouble(data.getString("lng").toString()));
+                                            statusListAdapter.notifyDataSetChanged();
+                                            LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat").toString()),
+                                                    Double.parseDouble(data.getString("lng").toString()));
 
 
-                                    //load the map and current position on first receive of `
-                                    if (loadCurrentPosition == false) {
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
-                                        loadCurrentPosition = true;
-                                        prevLatLng = currentLatLng;
-                                        home = currentLatLng;
-                                    }
-                                    Log.i("ARM",data.getString("arm") + "Marker " + markerChanged);
-                                    //change color of markers based on arm
-                                    if (data.getString("arm").toLowerCase().equals("true") && !markerChanged) {
-                                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
-                                        if (checkPermission(Manifest.permission.SEND_SMS) && send_message) {
-                                            try {
-                                                //SmsManager smsManager = SmsManager.getDefault();
-                                                //smsManager.sendTextMessage("9841122040", null, "Drone incoming", null, null);
-                                                send_message=false;
+                                            //load the map and current position on first receive of `
+                                            if (loadCurrentPosition == false) {
+                                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.0f));
+                                                loadCurrentPosition = true;
+                                                prevLatLng = currentLatLng;
+                                                home = currentLatLng;
                                             }
-                                            catch (Exception e)
-                                            {
-                                                Toast.makeText(MapsActivity.this, "message sending failed",Toast.LENGTH_SHORT).show();
+                                            Log.i("ARM",data.getString("arm") + "Marker " + markerChanged);
+                                            //change color of markers based on arm
+                                            if (data.getString("arm").toLowerCase().equals("true") && !markerChanged) {
+                                                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
+                                                if (checkPermission(Manifest.permission.SEND_SMS) && send_message) {
+                                                    try {
+                                                        //SmsManager smsManager = SmsManager.getDefault();
+                                                        //smsManager.sendTextMessage("9841122040", null, "Drone incoming", null, null);
+                                                        send_message=false;
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                        Toast.makeText(MapsActivity.this, "message sending failed",Toast.LENGTH_SHORT).show();
+                                                    }
+                                                } else {
+                                                    Toast.makeText(MapsActivity.this, "Permission denied", Toast.LENGTH_SHORT).show();
+                                                }
+                                                markerChanged = true;
+                                                Log.i("ARM","ARMED");
+                                            } else if (data.getString("arm").toLowerCase().equals("false") & markerChanged) {
+                                                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
+                                                markerChanged = false;
+                                                Log.i("ARM","DISARMED");
                                             }
-                                            } else {
-                                            Toast.makeText(MapsActivity.this, "Permission denied", Toast.LENGTH_SHORT).show();
+
+                                            //set the rotation based on heading
+                                            marker.setRotation(Float.parseFloat(data.getString("head").toString()));
+
+                                            //set the location
+                                            marker.setPosition(currentLatLng);
+
+                                            //start making the flight path after the fly command is sent
+                                            if (makeDronePath) {
+                                                dronePath.add(mMap.addPolyline(new PolylineOptions()
+                                                        .add(prevLatLng, currentLatLng)
+                                                        .width(1)
+                                                        .color(Color.GREEN)));
+                                            }
+                                            prevLatLng = currentLatLng;
+
+                                        } catch (JSONException e) {
+
+                                            Log.i("INFO", "Json exception in status data receive");
+                                            e.printStackTrace();
                                         }
-                                        markerChanged = true;
-                                        Log.i("ARM","ARMED");
-                                    } else if (data.getString("arm").toLowerCase().equals("false") & markerChanged) {
-                                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
-                                        markerChanged = false;
-                                        Log.i("ARM","DISARMED");
                                     }
-
-                                    //set the rotation based on heading
-                                    marker.setRotation(Float.parseFloat(data.getString("head").toString()));
-
-                                    //set the location
-                                    marker.setPosition(currentLatLng);
-
-                                    //start making the flight path after the fly command is sent
-                                    if (makeDronePath) {
-                                        dronePath.add(mMap.addPolyline(new PolylineOptions()
-                                                .add(prevLatLng, currentLatLng)
-                                                .width(1)
-                                                .color(Color.GREEN)));
-                                    }
-                                    prevLatLng = currentLatLng;
-
-                                } catch (JSONException e) {
-
-                                    Log.i("INFO", "Json exception in status data receive");
-                                    e.printStackTrace();
-                                }
+                                });
+                                //Toast.makeText(getContext(), args[0].toString(), Toast.LENGTH_SHORT).show();
                             }
-                        });
-                        //Toast.makeText(getContext(), args[0].toString(), Toast.LENGTH_SHORT).show();
-                    }
-                }
+                        }
 
-            }).on("Mission", new Emitter.Listener() {
+                    }).on("Mission", new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
@@ -946,6 +968,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     runOnUiThread(new Runnable() {
                         public void run() {
+//                            if(res != null) {
+                                checkList.get(4).setCheck(true);
+//                            }
                             try {
                                 mission = new JSONObject(res);
                                 //getting mission and adding title and snippet based on command number
@@ -1065,7 +1090,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }
 
-        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+            }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
