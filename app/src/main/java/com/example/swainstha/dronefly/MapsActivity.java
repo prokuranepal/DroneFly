@@ -192,7 +192,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         place=getIntent().getStringExtra("place");
         urlString=getIntent().getStringExtra("url_id");
-        urlString=urlString.replaceFirst("android", "");
+        urlString=urlString.replaceFirst("android/", "");
         Log.i("mapsactivity url",urlString);
         String access = getIntent().getStringExtra("access");
         if(place != null) {

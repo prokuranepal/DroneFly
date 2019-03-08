@@ -55,7 +55,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
 
     ImageView imageView;
-    //EditText username;
+    EditText username;
     EditText password;
     Button sign;
     JSONObject user_detail = new JSONObject();
@@ -66,14 +66,14 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     boolean connection_flag = false;
     SharedPreferences shared;
     RequestQueue queue;
-
-    String url = "http://192.168.1.81:3000/android/";
+    String drone_names;
+   // String url = "http://192.168.43.112:3000/android/";
+    String url = "http://drone.nicnepal.org/android/";
 //    private  String url = "https://nicwebpage.herokuapp.com/android/";
    // private final String url = "http://drone.nicnepal.org:8081/android/";
-    Spinner username;
-    String user_name;
+    Spinner drone_name;
 
-    String[] items = new String[]{"ADMIN", "NICPULCHOWK", "NICNANGI","NICRAMCHE","NICKHOKANA","NICDHARAN","NICBENI"};
+    String[] items = new String[]{"JT601", "JT602", "JT603","JT604"};
 
 
 
@@ -84,18 +84,18 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         setContentView(R.layout.activity_login);
 
         queue = Volley.newRequestQueue(this);
-        username = findViewById(R.id.spinner1);
-        username.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary),PorterDuff.Mode.SRC_ATOP);
+        drone_name = findViewById(R.id.spinner1);
+        drone_name.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary),PorterDuff.Mode.SRC_ATOP);
         //username.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
      //   username.getBackground().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 
 // Request a string response from the provided URL.
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, items);
 
-        username.setAdapter(adapter);
-        username.setOnItemSelectedListener(this);
+        drone_name.setAdapter(adapter);
+        drone_name.setOnItemSelectedListener(this);
         imageView = (ImageView) findViewById(R.id.imageView);
-        // username = (EditText) findViewById(R.id.editText);
+        username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.editText2);
         sign = (Button) findViewById(R.id.button);
 
@@ -117,8 +117,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
     public void signUpSignInOption() {
         Intent i = new Intent(getApplicationContext(), MapsActivity.class);
-       // i.putExtra("place",user_name);
-        i.putExtra("place","JT603");
+        i.putExtra("place",drone_names);
+        //i.putExtra("place","JT603");
         access_type = access_type.substring(0,1).toUpperCase() + access_type.substring(1).toLowerCase();
         i.putExtra("access",access_type);
         i.putExtra("url_id",this.url);
@@ -165,11 +165,12 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> User = new HashMap<String, String>();
-                User.put("username", user_name);
+                //User.put("username", user_name);
                 //Toast.makeText(getApplicationContext(),user_name,Toast.LENGTH_SHORT).show();
-                Log.i("user_name",user_name);
-//                User.put("password", password.getText().toString());
-                User.put("password", "nicdrone");
+                //Log.i("user_name",user_name);
+                User.put("username", username.getText().toString());
+                User.put("password", password.getText().toString());
+                //User.put("password", "nicdrone");
                 return User;
             }
         };
@@ -182,9 +183,9 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-        user_name = adapterView.getItemAtPosition(i).toString().toLowerCase();
-        if(user_name.equals("admin")) {
-            user_name="nicdrone";
+        drone_names = adapterView.getItemAtPosition(i).toString().toUpperCase();
+        if(drone_names.equals("admin")) {
+            drone_names="nicdrone";
             access_type = "root";
         } else{
             access_type = "normal";

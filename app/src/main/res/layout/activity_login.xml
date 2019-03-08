@@ -32,37 +32,44 @@
             android:textAlignment="gravity" />
 
         <EditText
+            android:id="@+id/username"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="72dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:ems="10"
+            android:hint="username"
+            android:inputType="text"
+            android:paddingLeft="10dp"
+            android:textColor="@color/colorPrimary"
+            android:textCursorDrawable="@null" />
+
+        <EditText
             android:id="@+id/editText2"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/spinner1"
-            android:layout_marginTop="12dp"
+            android:layout_below="@+id/username"
+            android:backgroundTint="@color/colorPrimary"
             android:ems="10"
             android:hint="password"
             android:inputType="textPassword"
-            android:textCursorDrawable="@null"
-            android:textColor="@color/colorPrimary"
             android:paddingLeft="10dp"
-            android:backgroundTint="@color/colorPrimary"/>
+            android:textColor="@color/colorPrimary"
+            android:textCursorDrawable="@null" />
 
         <Button
             android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:layout_below="@+id/editText2"
-            android:layout_marginTop="21dp"
             android:backgroundTint="@color/colorPrimary"
             android:onClick="LogInNow"
             android:paddingLeft="20dp"
-            android:text="Sign In"
+            android:text="SIGN IN"
             android:textColor="@color/common_google_signin_btn_text_dark_default"
             android:textColorLink="@color/common_google_signin_btn_text_dark_default" />
-
-
-
     </RelativeLayout>
 </android.widget.RelativeLayout>
