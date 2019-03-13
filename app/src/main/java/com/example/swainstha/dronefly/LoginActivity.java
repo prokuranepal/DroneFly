@@ -67,8 +67,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     SharedPreferences shared;
     RequestQueue queue;
     String drone_names;
-   // String url = "http://192.168.43.112:3000/android/";
-    String url = "http://drone.nicnepal.org/android/";
+    String url = "http://192.168.1.81:3000/android/";
+    //String url = "http://drone.nicnepal.org/android/";
 //    private  String url = "https://nicwebpage.herokuapp.com/android/";
    // private final String url = "http://drone.nicnepal.org:8081/android/";
     Spinner drone_name;

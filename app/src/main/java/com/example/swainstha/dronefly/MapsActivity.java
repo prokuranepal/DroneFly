@@ -809,6 +809,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 try {
                                     data = new JSONObject(res);
+                                    Log.i("copter-data", String.valueOf(data));
                                 } catch (JSONException e) {
                                     Log.i("INFO", "Json Exception");
                                 }
@@ -852,7 +853,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             statusListAdapter.notifyDataSetChanged();
                                             LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat").toString()),
                                                     Double.parseDouble(data.getString("lng").toString()));
-
+                                            Log.i("lat long position", String.valueOf(currentLatLng));
 
                                             //load the map and current position on first receive of `
                                             if (loadCurrentPosition == false) {
