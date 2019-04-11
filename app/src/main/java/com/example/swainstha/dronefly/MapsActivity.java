@@ -811,7 +811,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     data = new JSONObject(res);
                                     Log.i("copter-data", String.valueOf(data));
                                 } catch (JSONException e) {
-                                    Log.i("INFO", "Json Exception");
+                                    Log.i("INFO", "Json Exception in copter data");
                                 }
                                 runOnUiThread(new Runnable() {
                                     public void run() {
