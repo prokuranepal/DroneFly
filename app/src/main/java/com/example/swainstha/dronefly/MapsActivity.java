@@ -308,7 +308,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         circle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("INFO","HIDDEN");
+                Log.i("INFO","CIRCLE");
                 if(!circleUnCirle) {
                     LatLng latLng = home;
                     int radius;
@@ -390,7 +390,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     obj.accumulate("device","android");
                     Log.i("INFO",obj.toString());
                     String res = sendCommand.execute("getMission",obj.toString()).get();
-                    Log.i("INFO", res);
+                    Toast.makeText(MapsActivity.this, "Download Mission " + res, Toast.LENGTH_SHORT).show();
                 } catch(ExecutionException e) {
                     Log.i("INFO","Execution exception");
                 } catch(InterruptedException i) {
@@ -446,11 +446,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.accumulate("file", place.toLowerCase() + destination.substring(0,1).toUpperCase() + destination.substring(1).toLowerCase());
+                    String res = sendCommand.execute("positions",jsonObject.toString()).get();
+                    Toast.makeText(MapsActivity.this, "Download Mission " + res, Toast.LENGTH_SHORT).show();
                     Log.i("file",jsonObject.toString());
                 } catch(JSONException je) {
                     je.printStackTrace();
+                } catch(InterruptedException i) {
+                    Log.i("INFO","Interrupted exception");
+                } catch(ExecutionException e) {
+                    Log.i("INFO","Execution exception");
                 }
-                sendCommand.execute("positions",jsonObject.toString());
+
                 Log.i("Send", place + "-" + destination);
             }
         });
@@ -517,13 +523,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     switch (flyMode) {
                         case 1:
                             res = sendCommand.execute("fly", "1").get();
+                            Toast.makeText(MapsActivity.this, "FLy  " + res, Toast.LENGTH_SHORT).show();
                             send_message=true;
                             break;
                         case 2:
                             res = sendCommand.execute("LAND", "1").get();
+                            Toast.makeText(MapsActivity.this, "Land  " + res, Toast.LENGTH_SHORT).show();
                             break;
                         case 3:
                             res = sendCommand.execute("RTL", "1").get();
+                            Toast.makeText(MapsActivity.this, "RTL  " + res, Toast.LENGTH_SHORT).show();
                             break;
                     }
                     flyMode = 0;
@@ -784,12 +793,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                     runOnUiThread(new Runnable() {
                         public void run() {
-//                            try {
-////                                String s_error =data_error.getString("msg");
-////                                Toast.makeText(MapsActivity.this,s_error , Toast.LENGTH_SHORT).show();
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
+                            try {
+                                String s_error =data_error.getString("msg");
+                                Toast.makeText(MapsActivity.this,s_error , Toast.LENGTH_SHORT).show();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
 
                         }
                     });
@@ -825,7 +834,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             } else {
                                                 makeDronePath = false;
 
-                                                if(data.getInt("fix") == 3) {
+                                                if(data.getInt("fix") >= 3) {
                                                     checkList.get(0).setCheck(true);
                                                 }
                                                 if(data.getString("ekf").equals("true")) {
@@ -839,6 +848,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 }
                                                 checkListAdapter.notifyDataSetChanged();
                                             }
+                                            Log.i("INFO", "set the data in the list");
                                             while (iter.hasNext()) {
                                                 String key = (String) iter.next();
                                                 String value = data.getString(key);
@@ -850,9 +860,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                                for (int i = 0; i < statusList.size(); i++) {
 //                                    statusList.get(i).setValue(data.names().get(i).toString());
 //                                }
-                                            statusListAdapter.notifyDataSetChanged();
-                                            LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat").toString()),
-                                                    Double.parseDouble(data.getString("lng").toString()));
+
+                                            Log.i("INFO", "set the data in the list. notifyDataSetChanged");
+                                            LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat")),
+                                                    Double.parseDouble(data.getString("lng")));
                                             Log.i("lat long position", String.valueOf(currentLatLng));
 
                                             //load the map and current position on first receive of `
@@ -862,7 +873,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 prevLatLng = currentLatLng;
                                                 home = currentLatLng;
                                             }
-                                            Log.i("ARM",data.getString("arm") + "Marker " + markerChanged);
+//                                            Log.i("ARM",data.getString("arm") + "Marker " + markerChanged);
                                             //change color of markers based on arm
                                             if (data.getString("arm").toLowerCase().equals("true") && !markerChanged) {
                                                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
@@ -888,7 +899,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             }
 
                                             //set the rotation based on heading
-                                            marker.setRotation(Float.parseFloat(data.getString("head").toString()));
+                                            marker.setRotation(Float.parseFloat(data.getString("head")));
 
                                             //set the location
                                             marker.setPosition(currentLatLng);
@@ -901,10 +912,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         .color(Color.GREEN)));
                                             }
                                             prevLatLng = currentLatLng;
+                                            statusListAdapter.notifyDataSetChanged();
 
                                         } catch (JSONException e) {
 
-                                            Log.i("INFO", "Json exception in status data receive");
+                                            Log.i("INFO", "Json exception in status data receive while parsing");
                                             e.printStackTrace();
                                         }
                                     }
@@ -920,7 +932,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     final String res = args[0].toString();
                     //final String res = "{\"0\":{\"lat\":27.686328887939453,\"lng\":85.3176498413086},\"1\":{\"lat\":27.687082290649414,\"lng\":85.31800842285156,\"command\":16,\"alt\":10},\"2\":{\"lat\":27.686342239379883,\"lng\":85.31832885742188,\"command\":16,\"alt\":10},\"3\":{\"lat\":27.68666648864746,\"lng\":85.31977844238281,\"command\":16,\"alt\":10},\"4\":{\"lat\":27.687395095825195,\"lng\":85.32050323486328,\"command\":16,\"alt\":10}}";
-                    Log.i("INFO", res);
+                    Log.i("INFO", "Mission" + res);
 
                     runOnUiThread(new Runnable() {
                         public void run() {
@@ -960,7 +972,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
 
                             } catch (JSONException e) {
-                                Log.i("INFO", "Json Exception");
+                                Log.i("INFO", "Json Exception in Mission");
                             }
 
                         }
@@ -979,7 +991,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         try {
                             data = new JSONObject(res);
                         } catch (JSONException e) {
-                            Log.i("INFO", "Json Exception");
+                            Log.i("INFO", "Json Exception while receiving simulate data");
                         }
                         runOnUiThread(new Runnable() {
                             public void run() {
@@ -1037,7 +1049,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 } catch (JSONException e) {
 
-                                    Log.i("INFO", "Json exception in status data receive");
+                                    Log.i("INFO", "Json exception in simulate data ofstatus data receive");
                                     e.printStackTrace();
                                 }
                             }
@@ -1050,6 +1062,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 @Override
                 public void call(Object... args) {
+                    Log.i("INFO", "socket disconneted");
+                    initSocket();
                 }
 
             });
@@ -1100,7 +1114,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(String result) {
 
-            //Log.i("INFO",result);
+            Log.i("INFO","On post execute of send command" + result);
             result = "";
         }
     }
