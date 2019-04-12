@@ -696,6 +696,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        socket.disconnect();
+    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -822,45 +828,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 } catch (JSONException e) {
                                     Log.i("INFO", "Json Exception in copter data");
                                 }
+
+                                int i = 0;
+                                try {
+                                    Iterator iter = data.keys();
+                                    if (data.getString("arm").equals("true")) {
+                                        makeDronePath = true;
+                                        Log.i("INFO", "Inside arm equals to true");
+                                    } else {
+                                        makeDronePath = false;
+
+                                        if (data.getInt("fix") >= 3) {
+                                            checkList.get(0).setCheck(true);
+                                        }
+                                        if (data.getString("ekf").equals("true")) {
+                                            checkList.get(3).setCheck(true);
+                                        }
+                                        if (abs(Double.parseDouble(data.getString("pitch"))) < 1 && abs(Double.parseDouble(data.getString("roll"))) < 1) {
+                                            checkList.get(2).setCheck(true);
+                                        }
+                                        if (abs(Double.parseDouble(data.getString("volt"))) > 12.4) {
+                                            checkList.get(1).setCheck(true);
+                                        }
+//                                        checkListAdapter.notifyDataSetChanged();
+                                    }
+                                    Log.i("INFO", "set the data in the list");
+                                    while (iter.hasNext()) {
+                                        String key = (String) iter.next();
+                                        String value = data.getString(key);
+                                        statusList.get(i).setValue(value);
+                                        i++;
+                                    }
+                                } catch(JSONException jsone) {
+                                    Log.i("INFO","failed to parse the received data");
+                                }
                                 runOnUiThread(new Runnable() {
                                     public void run() {
                                         try {
 
-                                            int i = 0;
-                                            Iterator iter = data.keys();
-                                            if(data.getString("arm").equals("true")) {
-                                                makeDronePath = true;
-                                                Log.i("INFO", "Inside arm equals to true");
-                                            } else {
-                                                makeDronePath = false;
 
-                                                if(data.getInt("fix") >= 3) {
-                                                    checkList.get(0).setCheck(true);
-                                                }
-                                                if(data.getString("ekf").equals("true")) {
-                                                    checkList.get(3).setCheck(true);
-                                                }
-                                                if(abs(Double.parseDouble(data.getString("pitch"))) < 1 && abs(Double.parseDouble(data.getString("roll"))) < 1) {
-                                                    checkList.get(2).setCheck(true);
-                                                }
-                                                if(abs(Double.parseDouble(data.getString("volt"))) > 12.4) {
-                                                    checkList.get(1).setCheck(true);
-                                                }
+                                            if (!data.getString("arm").equals("true")) {
                                                 checkListAdapter.notifyDataSetChanged();
                                             }
-                                            Log.i("INFO", "set the data in the list");
-                                            while (iter.hasNext()) {
-                                                String key = (String) iter.next();
-                                                String value = data.getString(key);
-                                                statusList.get(i).setValue(value);
-                                                i++;
-                                            }
-
-
-//                                for (int i = 0; i < statusList.size(); i++) {
-//                                    statusList.get(i).setValue(data.names().get(i).toString());
-//                                }
-
                                             Log.i("INFO", "set the data in the list. notifyDataSetChanged");
                                             LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat")),
                                                     Double.parseDouble(data.getString("lng")));
@@ -888,7 +897,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         Toast.makeText(MapsActivity.this, "message sending failed",Toast.LENGTH_SHORT).show();
                                                     }
                                                 } else {
-                                                    Toast.makeText(MapsActivity.this, "Permission denied", Toast.LENGTH_SHORT).show();
+//                                                    Toast.makeText(MapsActivity.this, "Permission denied", Toast.LENGTH_SHORT).show();
                                                 }
                                                 markerChanged = true;
                                                 Log.i("ARM","ARMED");
