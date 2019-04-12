@@ -697,11 +697,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        socket.disconnect();
-    }
+//    @Override
+//    protected void onStop() {
+//        Log.i("INFO", "socket and program stopped");
+//        super.onStop();
+//        socket.disconnect();
+//    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -1072,7 +1073,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void call(Object... args) {
                     Log.i("INFO", "socket disconneted");
-                    initSocket();
+                    try {
+                        socket = IO.socket(urlString + place);
+                        socket.connect(); //connecting to the server
+                    } catch(URISyntaxException uri) {
+                        Log.i("INFO", "socket cannot be connected be again");
+                    }
                 }
 
             });
@@ -1080,7 +1086,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.i("INFO","Uri syntax exception");
         } catch(Exception e) {
             Log.i("INFO", "No internet connection");
-            Toast.makeText(this, "No Internet", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, "No Internet", Toast.LENGTH_LONG).show();
         }
 
     }
