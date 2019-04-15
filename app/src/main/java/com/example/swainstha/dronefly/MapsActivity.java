@@ -148,6 +148,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     AlertDialog.Builder builder; //dialog builder to ask for confirmation after fly button is pressed
 
+//timer for reconnecting socket
+    Timer timer = new Timer();
 
     //For floating buttons
     FloatingActionButton fab;
@@ -217,8 +219,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
               } catch(Exception e) {
                   Log.i("INFO", " no internet connection");
               }
-              //socket.off();
-              //initSocket();
           }
 
         }
@@ -734,7 +734,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         inflater2.inflate(R.layout.id_list_view,idListView, false);
         idListView.setAdapter(idListAdapter);
 
-        Timer timer = new Timer();
+
 
         long delay = 0;
 
@@ -747,13 +747,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    @Override
-    protected void onStop() {
-        Log.i("INFO", "socket and program stopped");
-        super.onStop();
-        socket.disconnect();
-        socket.off();
-    }
+//    @Override
+//    protected void onStop() {
+//        Log.i("INFO", "socket and program stopped");
+//        super.onStop();
+//        socket.disconnect();
+//        socket.off();
+//    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -785,10 +785,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onDestroy() {
+        Log.i("INFO", "activity destroyed");
         super.onDestroy();
-
-        socket.disconnect();
-        socket.off();
+        if(socket != null) {
+            socket.disconnect();
+            socket.off();
+            timer.cancel();
+        }
     }
 
     public void initSocket() {
@@ -935,7 +938,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             Log.i("INFO", "set the data in the list. notifyDataSetChanged");
                                             LatLng currentLatLng = new LatLng(Double.parseDouble(data.getString("lat")),
                                                     Double.parseDouble(data.getString("lng")));
-                                            Log.i("lat long position", String.valueOf(currentLatLng));
+//                                            Log.i("lat long position", String.valueOf(currentLatLng));
 
                                             //load the map and current position on first receive of `
                                             if (loadCurrentPosition == false) {
@@ -1133,6 +1136,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 @Override
                 public void call(Object... args) {
+                    socket.disconnect();
                     Log.i("INFO", "socket disconneted " + socket.connected());
                     try {
 //                        socket.off();
