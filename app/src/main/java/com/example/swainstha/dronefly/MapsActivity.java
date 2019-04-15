@@ -69,6 +69,9 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 import static java.lang.Math.abs;
+import java.util.Timer;
+
+import java.util.TimerTask;
 
 //CheckListAdapter.PictureClickListener
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, CheckListAdapter.PictureClickListener {
@@ -184,6 +187,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    TimerTask task = new TimerTask() {
+
+        @Override
+
+        public void run() {
+            if(socket != null) {
+                Log.i("INFO", "timer working yeah" + socket.connected());
+            }
+          if(socket != null && !socket.connected()) {
+              socket.connect();
+              SendCommand sendCommand = new SendCommand();
+              try {
+
+                  //check for internet connectivity
+                  if (!isOnline()) {
+                      throw new Exception();
+                  }
+
+                  //execute worker thread to send data
+                  Log.i("DATA", sendCommand.execute("joinAndroid", "1").get());
+
+              } catch (InterruptedException e) {
+                  e.printStackTrace();
+                  Log.i("INFO", "Failed Sending");
+              } catch (ExecutionException e) {
+                  e.printStackTrace();
+                  Log.i("INFO", "Failed Sending");
+              } catch(Exception e) {
+                  Log.i("INFO", " no internet connection");
+              }
+              //socket.off();
+              //initSocket();
+          }
+
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -392,11 +432,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     String res = sendCommand.execute("getMission",obj.toString()).get();
                     Toast.makeText(MapsActivity.this, "Download Mission " + res, Toast.LENGTH_SHORT).show();
                 } catch(ExecutionException e) {
-                    Log.i("INFO","Execution exception");
+                    Log.i("INFO","Execution exception in download mission");
                 } catch(InterruptedException i) {
-                    Log.i("INFO","Interrupted exception");
+                    Log.i("INFO","Interrupted exception in download mission");
                 } catch(JSONException j) {
-                    Log.i("INFO","Json exception");
+                    Log.i("INFO","Json exception in download mission");
                 }
             }
         });
@@ -694,15 +734,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         inflater2.inflate(R.layout.id_list_view,idListView, false);
         idListView.setAdapter(idListAdapter);
 
+        Timer timer = new Timer();
+
+        long delay = 0;
+
+        long intevalPeriod = 5 * 1000;
+
+        timer.scheduleAtFixedRate(task, delay,
+
+                intevalPeriod);
+
     }
 
 
-//    @Override
-//    protected void onStop() {
-//        Log.i("INFO", "socket and program stopped");
-//        super.onStop();
-//        socket.disconnect();
-//    }
+    @Override
+    protected void onStop() {
+        Log.i("INFO", "socket and program stopped");
+        super.onStop();
+        socket.disconnect();
+        socket.off();
+    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -730,6 +781,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Log.i("INFO","Hello");
         initSocket();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        socket.disconnect();
+        socket.off();
     }
 
     public void initSocket() {
@@ -796,7 +855,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     try {
                         data_error = new JSONObject(error_msg);
                     } catch (JSONException e) {
-                        Log.i("INFO", "Json Exception");
+                        Log.i("INFO", "Json Exception in error");
                     }
                     runOnUiThread(new Runnable() {
                         public void run() {
@@ -805,6 +864,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 Toast.makeText(MapsActivity.this,s_error , Toast.LENGTH_SHORT).show();
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                            } catch(NullPointerException npe) {
+                                npe.printStackTrace();
                             }
 
                         }
@@ -1072,11 +1133,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 @Override
                 public void call(Object... args) {
-                    Log.i("INFO", "socket disconneted");
+                    Log.i("INFO", "socket disconneted " + socket.connected());
                     try {
-                        socket = IO.socket(urlString + place);
+//                        socket.off();
+//                        socket = IO.socket(urlString + place);
                         socket.connect(); //connecting to the server
-                    } catch(URISyntaxException uri) {
+                        Log.i("INFO", "trying to reconnect");
+                    } catch(Exception e) {
                         Log.i("INFO", "socket cannot be connected be again");
                     }
                 }
