@@ -213,6 +213,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
               } catch (InterruptedException e) {
                   e.printStackTrace();
                   Log.i("INFO", "Failed Sending");
+
               } catch (ExecutionException e) {
                   e.printStackTrace();
                   Log.i("INFO", "Failed Sending");
