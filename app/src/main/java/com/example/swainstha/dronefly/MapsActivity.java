@@ -1031,17 +1031,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     }
 
                                     //checking for first mission command
-                                    if (firstMissionLoad) {
+                                    if (firstMissionLoad  && Integer.parseInt(j.getString("command")) != 183) {
                                         prevLatLngMission = latLng;
                                         firstMissionLoad = false;
                                     }
 
                                     //adding mission path
-                                    missionPath.add(mMap.addPolyline(new PolylineOptions()
-                                            .add(prevLatLngMission, latLng)
-                                            .width(1)
-                                            .color(Color.RED)));
-
+                                    if(i == 0 || Integer.parseInt(j.getString("command")) == 21 || Integer.parseInt(j.getString("command")) == 16) {
+                                        missionPath.add(mMap.addPolyline(new PolylineOptions()
+                                                .add(prevLatLngMission, latLng)
+                                                .width(1)
+                                                .color(Color.RED)));
+                                    }
+                                if(Integer.parseInt(j.getString("command")) != 183)
                                     prevLatLngMission = latLng;
                                 }
 
