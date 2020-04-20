@@ -14,8 +14,12 @@ First you will need to setup a server to establish a socket connection with as s
 #### Clone the repo and generate an apk to be installed in an android phone and login with provided credentials
 
 Some Screenshots of the app:
-![mission](mission.png)
-<br></br>
-![general] (general.png)
-<br></br>
-![login](login.png)
+<br>
+<img src="login.jpg" width="280" height="450"/>
+<br>
+<img src="mission.jpg" width="700" height="450"/>
+<br>
+<img src="general.jpg" width="700" height="450" />
+
+
+
