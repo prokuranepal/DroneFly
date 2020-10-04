@@ -80,10 +80,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Marker marker;
     private Socket socket;
     String place;
+    String userId;
     String destination = "";
     String mode = "Real";
     //    private final String urlString = "http://192.168.1.67:3000/";
-    // private final String urlString = "https://nicwebpage.herokuapp.com/";
+//     private final String urlString = "https://nicwebpage.herokuapp.com/";
     private  String urlString = null;
     // private final String urlString = "http://drone.nicnepal.org:8081";
 
@@ -198,6 +199,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.i("INFO", "timer working yeah" + socket.connected());
             }
           if(socket != null && !socket.connected()) {
+              Log.i("DATA join", "socket connected");
+
               socket.connect();
               SendCommand sendCommand = new SendCommand();
               try {
@@ -208,11 +211,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                   }
 
                   //execute worker thread to send data
-                  Log.i("DATA", sendCommand.execute("joinAndroid", "1").get());
-
+                  Log.i("UserId","userId "+userId);
+                  sendCommand.execute("joinDMS", userId).get();
+                  Log.e("INFO", "After joinDms");
               } catch (InterruptedException e) {
                   e.printStackTrace();
-                  Log.i("INFO", "Failed Sending");
+                  Log.e("INFO", "Failed Sending");
 
               } catch (ExecutionException e) {
                   e.printStackTrace();
@@ -232,8 +236,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_map);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         place=getIntent().getStringExtra("place");
+        userId=getIntent().getStringExtra("user_id");
         urlString=getIntent().getStringExtra("url_id");
-        urlString=urlString.replaceFirst("android/", "");
+        //urlString=urlString.replaceFirst("android/", "");
         Log.i("mapsactivity url",urlString);
         String access = getIntent().getStringExtra("access");
         if(place != null) {
@@ -244,7 +249,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         //initialize socket by sending joinAndroid event
-//        initSocket();
+        initSocket();
 
         //markers, mission path and drone path arraylist
         missionMarker = new ArrayList<>();
@@ -313,7 +318,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 idList.get(6).setValue(destination);
                 idListAdapter.notifyDataSetChanged();
                 builder.setTitle("FLight from " + place + " to " + destination + ".");
-                Toast.makeText(getApplicationContext(), place + " to " + destination, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), place + " to " + destination, Toast.LENGTH_SHORT).show();
 
             }
 
@@ -427,8 +432,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 SendCommand sendCommand = new SendCommand();
                 try {
                     JSONObject obj = new JSONObject();
-                    obj.accumulate("mission","1");
+                    obj.accumulate("mission",String.valueOf(System.currentTimeMillis()));
                     obj.accumulate("device","android");
+                    obj.put("timeStamp", System.currentTimeMillis());
+                    servo_on = true;
                     Log.i("INFO",obj.toString());
                     String res = sendCommand.execute("getMission",obj.toString()).get();
                     Toast.makeText(MapsActivity.this, "Download Mission " + res, Toast.LENGTH_SHORT).show();
@@ -487,6 +494,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.accumulate("file", place.toLowerCase() + destination.substring(0,1).toUpperCase() + destination.substring(1).toLowerCase());
+                    jsonObject.put("timeStamp",System.currentTimeMillis());
                     String res = sendCommand.execute("positions",jsonObject.toString()).get();
                     Toast.makeText(MapsActivity.this, "Download Mission " + res, Toast.LENGTH_SHORT).show();
                     Log.i("file",jsonObject.toString());
@@ -511,7 +519,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     makeDronePathS = true;
                     clearMission();
                     SendCommand sendCommand = new SendCommand();
-                    sendCommand.execute("simulate","");
+                    sendCommand.execute("simulate",String.valueOf(System.currentTimeMillis()));
                     simulate.setText("Cancel");
                     cancelSimulation = true;
                     simulateMission = true;
@@ -520,7 +528,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     idListAdapter.notifyDataSetChanged();
                 } else {
                     SendCommand sendCommand = new SendCommand();
-                    sendCommand.execute("cancelSimulate","");
+                    sendCommand.execute("cancelSimulate",String.valueOf(System.currentTimeMillis()));
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
                     makeDronePathS = false;
                     simulate.setText("Simulate");
@@ -540,11 +548,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View view) {
                 SendCommand sendCommand = new SendCommand();
                 if(servo_on) {
-                    sendCommand.execute("servo", "off");
-                    servo_on = false;
+                    JSONObject obj = new JSONObject();
+                    try {
+                        obj.put("value", "off");
+                        obj.put("timeStamp", System.currentTimeMillis());
+                        sendCommand.execute("servo", String.valueOf(obj));
+                        servo_on = false;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                 } else {
-                    sendCommand.execute("servo", "on");
-                    servo_on = true;
+                    JSONObject obj1 = new JSONObject();
+                    try {
+                        obj1.put("value", "off");
+                        obj1.put("timeStamp", System.currentTimeMillis());
+                        sendCommand.execute("servo", String.valueOf(obj1));
+                        servo_on = true;
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
         });
@@ -563,16 +588,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     String res = "";
                     switch (flyMode) {
                         case 1:
-                            res = sendCommand.execute("fly", "1").get();
+                            Long tsLong = System.currentTimeMillis();
+                            String ts = tsLong.toString();
+                            res = sendCommand.execute("initiateFlight", ts).get();
                             Toast.makeText(MapsActivity.this, "FLy  " + res, Toast.LENGTH_SHORT).show();
                             send_message=true;
                             break;
                         case 2:
-                            res = sendCommand.execute("LAND", "1").get();
+                            Long tsLong2 = System.currentTimeMillis();
+                            String ts2 = tsLong2.toString();
+                            res = sendCommand.execute("LAND", ts2).get();
                             Toast.makeText(MapsActivity.this, "Land  " + res, Toast.LENGTH_SHORT).show();
                             break;
                         case 3:
-                            res = sendCommand.execute("RTL", "1").get();
+                            Long tsLong3 = System.currentTimeMillis();
+                            String ts3 = tsLong3.toString();
+                            res = sendCommand.execute("RTL", ts3).get();
                             Toast.makeText(MapsActivity.this, "RTL  " + res, Toast.LENGTH_SHORT).show();
                             break;
                     }
@@ -781,7 +812,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
         Log.i("INFO","Hello");
-        initSocket();
+//        initSocket();
     }
 
     @Override
@@ -810,10 +841,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int id = rand.nextInt(50) + 1;
 
 
-            Toast.makeText(getApplicationContext(), urlString + place, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), urlString + place, Toast.LENGTH_SHORT).show();
             //socket = manager.socket(place); //specifying the url
 //            if (place.equals("admin")) {
-            String url = urlString + place;
+           String url = urlString + place;
+        //    String url = urlString + "drones";
             Log.i("DATA", url);
             socket = IO.socket(urlString  + place);
 //            } else {
@@ -829,9 +861,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (!isOnline()) {
                     throw new Exception();
                 }
-
                 //execute worker thread to send data
-                Log.i("DATA", sendCommand.execute("joinAndroid", "1").get());
+                Log.i("DATA initSocket", sendCommand.execute("joinDMS", userId).get());
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -882,6 +913,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         @Override
                         public void call(Object... args) {
+                            Log.i("copter-data", "copter-data "+ String.valueOf(args));
 
                             if (!simulateMission) {
 
@@ -923,6 +955,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         String key = (String) iter.next();
                                         String value = data.getString(key);
                                         statusList.get(i).setValue(value);
+                                        Log.i("statusList",String.valueOf(statusList));
                                         i++;
                                     }
                                 } catch(JSONException jsone) {

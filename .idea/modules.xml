@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/DroneFly.iml" filepath="$PROJECT_DIR$/.idea/DroneFly.iml" />
-      <module fileurl="file://$PROJECT_DIR$/DroneFly.iml" filepath="$PROJECT_DIR$/DroneFly.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/DroneFly.iml" filepath="$PROJECT_DIR$/.idea/DroneFly.iml" group="DroneFly" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="DroneFly/app" />
     </modules>
   </component>
 </project>

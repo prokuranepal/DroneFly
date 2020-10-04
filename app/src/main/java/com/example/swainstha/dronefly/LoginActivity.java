@@ -30,6 +30,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -70,11 +71,11 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     //String url = "http://192.168.1.81:3000/android/";
     //String url = "http://drone.nicnepal.org/android/";
 //    private  String url = "https://nicwebpage.herokuapp.com/android/";
-    String url = "http://drone.nicnepal.org/android/";
+    String url = "http://4adfa0b33c0c.ngrok.io/";
     //String url = "http://202.52.0.160/android/";
     Spinner drone_name;
     String[] items = new String[]{"JT601", "JT602", "JT603","JT604"};
-
+    String user_id="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -96,7 +97,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.editText2);
         sign = (Button) findViewById(R.id.button);
-
+        username.setText("9840016544");
+        password.setText("sushil");
 
     }
 
@@ -120,6 +122,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         access_type = access_type.substring(0,1).toUpperCase() + access_type.substring(1).toLowerCase();
         i.putExtra("access",access_type);
         i.putExtra("url_id",this.url);
+        i.putExtra("user_id",this.user_id );
         startActivity(i);
     }
 
@@ -132,16 +135,20 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
     public void postRequestVolley(RequestQueue queue) {
         Log.i("inside request",url);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url+"users/login",
                 new Response.Listener<String>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(String response1) {
 
                         try {
+
+                                JSONObject response = new JSONObject(response1);
+
                             Log.i("response", response.toString());
-                            if (response.toString().equals("OK")) {
+                            if (response.getBoolean("success")) {
+                                user_id= response.getString("userId");
                                 signUpSignInOption();
-                                Toast.makeText(getApplicationContext(),"SignIn successful",Toast.LENGTH_SHORT).show();
+                                // Toast.makeText(getApplicationContext(),"SignIn successful",Toast.LENGTH_SHORT).show();
                                 // Display the first 500 characters of the response string.
                             } else {
                                 Log.i("info","username or password invalid");
@@ -154,6 +161,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                         }
                     }
 
+
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -165,12 +173,19 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                 Map<String, String> User = new HashMap<String, String>();
                 //User.put("username", user_name);
                 //Toast.makeText(getApplicationContext(),user_name,Toast.LENGTH_SHORT).show();
-                //Log.i("user_name",user_name);
-                User.put("username", username.getText().toString());
+                //Log.i("user_name",user_name);f
+                User.put("email", username.getText().toString());
                 User.put("password", password.getText().toString());
                 //User.put("password", "nicdrone");
                 return User;
             }
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                Map<String,String> params = new HashMap<String, String>();
+//                params.put("Content-Type","application/json");
+//                return params;
+//            }
+
         };
 
         queue.add(stringRequest);
